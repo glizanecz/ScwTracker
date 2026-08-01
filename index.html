@@ -55,7 +55,7 @@
     </style>
 </head>
 <body>
-    <div class="background">
+    <div id="loginMenuBack" class="background">
         <h1> Welcome to ScwTracker! </h1>
         <h3> A Lightweight task tracker for students, employees, and busy parents alike!</h3>
         <br>
@@ -63,12 +63,34 @@
         <br>
         <label for="password">Password:</label><input id="password" type="password" maxlength="15">
         <br>
-        <button class="sbmt">Login...</button> 
+        <button id="loginBtn" class="sbmt">Login...</button> 
         <br>
-        <button class="sbmt">Or Sign Up...</button>
+        <button id="signUpBtn" class="sbmt">Or Sign Up...</button>
+    </div>
+    <div id="signUpWelcome" class="background">
+        <h1>Welcome to ScwTracker!</h1>
+        <h2>If you need introductions, go to our <a href="https://glizanecz.github.io/ScwTracker/tutorial.html/">tutorial page</a>!!</h2>
     </div>
     <script type="module">
-        // Your JavaScript goes here
+        //Sections
+        const loginMenuBack = document.getElementById("loginMenuBack");
+        const signUpWelcome = document.getElementById("signUpWelcome");
+        signUpWelcome.style.display = "none";
+        //Elements for sign up & login
+        const username = document.getElementById("username");
+        const password = document.getElementById("password");
+        const loginBtn = document.getElementById("loginBtn");
+        const signUpBtn = document.getElementById("signUpBtn");
+        //Elements for sign up welcome
+
+        loginBtn.onclick = function () { 
+            loginMenuBack.style.display = "none"; //this is temporary, need to make front end first... //
+        }
+
+        signUpBtn.onclick = function () { 
+            loginMenuBack.style.display = "none"; //this is temporary, need to make front end first... //
+            signUpWelcome.style.display = "grid";
+        }
     </script>
 </body>
 </html>
