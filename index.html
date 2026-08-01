@@ -258,12 +258,16 @@
 
         async function setUserBasicsData() {
             try {
+                console.log("UUID:", uuid);
+                console.log("Saving:", username);
                 await setDoc(doc(db, "users", uuid, "userData", "basics"), {
                     username: username,
                     tasks: 0
                 })
+                console.log("Saved!");
             } catch (error) {
                 console.log("Data didn't set!")
+                console.error(error);
                 console.error(error.code);
                 console.error(error.message);
             }
