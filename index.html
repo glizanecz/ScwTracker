@@ -185,6 +185,7 @@
             if (response === "signedin") {
                 loginMenuBack.style.display = "none";
                 mainUserMenu.style.display = "grid";    
+                loadUserData();
             } else {
                 console.log("Couldn't login!")
             }
