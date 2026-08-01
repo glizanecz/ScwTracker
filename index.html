@@ -188,6 +188,7 @@
             } else if (response === "signedin") {
                 loginMenuBack.style.display = "none";
                 mainUserMenu.style.display = "grid";
+                await loadUserData();
             } else {
                 console.log("Couldn't sign up or login!")
             }
