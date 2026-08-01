@@ -231,7 +231,8 @@
                         uuid = credential.user.uid;
                         return "signedin"
                     } catch (error) {
-                        console.error(error);
+                        console.error(error.code);
+                        console.error(error.message);
                     }
                 } else {
                     console.error(error);
@@ -263,7 +264,8 @@
                 })
             } catch (error) {
                 console.log("Data didn't set!")
-                console.error(error);
+                console.error(error.code);
+                console.error(error.message);
             }
         }
     </script>
