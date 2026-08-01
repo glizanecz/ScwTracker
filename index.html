@@ -60,10 +60,11 @@
         textarea {
             width: 100%;
             height: 100%;
+            max-height: calc(100% - 10px);
+            max-width: calc(100% - 10px);
+            box-sizing: border-box; 
             display: flex;
             background-color: grey; 
-            min-height: calc(100% - 10px);
-            min-width: calc(100% - 10px);
             font: black;
             flex: 1;
         }
