@@ -91,7 +91,9 @@
         <h1>Welcome to ScwTracker!</h1>
         <h2>If you need introductions, go to our <a target="_blank" rel="noopener noreferrer" href="https://glizanecz.github.io/ScwTracker/tutorial.html">tutorial page</a>!!</h2>
         <label for="userNickname">Set a nickname or have one auto generated!</label>
+        <br>
         <input id="userNickname">
+        <br>
         <button id="goToMainBtn">Dive right in!</button>
     </div>
     <div id="mainUserMenu" class="background">
@@ -107,6 +109,7 @@
         const signUpWelcome = document.getElementById("signUpWelcome");
         signUpWelcome.style.display = "none";
         const mainUserMenu = document.getElementById("mainUserMenu");
+        mainUserMenu.style.display = "none";
         //Elements for sign up & login
         const usernameEl = document.getElementById("username");
         const passwordEl = document.getElementById("password");
