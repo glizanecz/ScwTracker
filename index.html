@@ -179,7 +179,7 @@
         let passwordInp = null;
         //Variables for welcome sign up
 
-        changeUsername.onclick = function () {
+        changeUsername.onclick = async function () {
           let usernamePrompt = prompt("What would your username to be?");
           if (isTextProfane(usernamePrompt) === true) {
             alert("Username is profane and invalid!")
@@ -199,6 +199,7 @@
           } else {
             username = usernamePrompt.replaceAll(" ", "");
             userWelcome.innerText = "Hello " + username + "!";
+            await setUserBasicsData();
             alert("Username set to " + username + "!")
           } 
 
