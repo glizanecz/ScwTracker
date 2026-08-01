@@ -205,13 +205,7 @@
             } else if (response === "signedin") {
                 loginMenuBack.style.display = "none";
                 mainUserMenu.style.display = "grid";
-                const snap = await getDoc(doc(db, "users", uuid, "userData", "basics"));
-                if (snap.exists()) {
-                    const data = snap.data();
-                    username = data.username;
-                    userWelcome.innerText = "Hello " + username + "!";
-                    tasks = data.tasks;
-                }
+                await loadUserData();
             } else {
                 console.log("Couldn't sign up or login!")
             }
@@ -222,14 +216,7 @@
             mainUserMenu.style.display = "grid";
             username = userNicknameInp.value;
             userWelcome.innerText = "Hello " + username + "!";
-            try {
-                await setDoc(doc(db, "users", uuid, "userData", "basics"), {
-                    username: username,
-                    tasks: 0
-                })
-            } catch (error) {
-                console.log("data didn't set!")
-            }
+            await setUserBasicsData()
         }
 
         async function createSignUpIfNeeded() {
@@ -250,6 +237,31 @@
                     console.log("Something went wrong...")
                     throw error;
                 }
+            }
+        }
+
+        async function loadUserData() {
+            try {
+                const snap = await getDoc(doc(db, "users", uuid, "userData", "basics"));
+                if (snap.exists()) {
+                    const data = snap.data();
+                    username = data.username;
+                    userWelcome.innerText = "Hello " + username + "!";
+                    tasks = data.tasks;
+                }
+            } catch (error) {
+                console.log("User data couldn't be loaded!")
+            }
+        }
+
+        async function setUserBasicsData() {
+            try {
+                await setDoc(doc(db, "users", uuid, "userData", "basics"), {
+                    username: username,
+                    tasks: 0
+                })
+            } catch (error) {
+                console.log("Data didn't set!")
             }
         }
     </script>
