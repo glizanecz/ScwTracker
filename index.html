@@ -22,7 +22,10 @@
         .background {
             background-color: rgb(177, 176, 176);
             padding: 20px;
-            width: min(600px, 100%);
+            width: 100%;
+            height: 100%;
+            max-height: calc(100% - 30px);
+            max-width: calc(100% - 30px);
             box-sizing: border-box;
             text-align: center;
             display: grid;
@@ -104,6 +107,44 @@
         <button id="addTaskBtn">Add A Task!</button>
     </div>
     <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-analytics.js";
+
+        import {
+            getAuth,
+            createUserWithEmailAndPassword,
+            signInWithEmailAndPassword,
+            signOut,
+            onAuthStateChanged
+        } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+
+        import {
+            getFirestore,
+            doc,
+            getDoc,
+            setDoc,
+            updateDoc,
+            increment,
+            serverTimestamp,
+        } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";  
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDR4uhiy7JQXSv0KV5VYbFpAOPK4fxSUls",
+            authDomain: "scwtrack-7d301.firebaseapp.com",
+            databaseURL: "https://scwtrack-7d301-default-rtdb.firebaseio.com",
+            projectId: "scwtrack-7d301",
+            storageBucket: "scwtrack-7d301.firebasestorage.app",
+            messagingSenderId: "211365189850",
+            appId: "1:211365189850:web:94d0607c4636d415d06de3",
+            measurementId: "G-SVYCRR65TK"
+        };
+
+
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
         //Sections
         const loginMenuBack = document.getElementById("loginMenuBack");
         const signUpWelcome = document.getElementById("signUpWelcome");
@@ -126,6 +167,7 @@
         //Variables for whole project
         let username = "somethin"
         let tasks = 0;
+        let uuid = null;
         //Variables for sign up & login
         let usernameInp = null;
         let passwordInp = null;
@@ -133,26 +175,81 @@
 
 
 
-        loginBtn.onclick = function () { 
-            loginMenuBack.style.display = "none"; //this is temporary, need to make front end first... //
-            mainUserMenu.style.display = "grid";
+        loginBtn.onclick = async function () { 
             usernameInp = usernameEl.value;
             passwordInp = passwordEl.value;
-            userWelcome.innerText = "Hello " + username + "!";
+
+            const response = await createSignUpIfNeeded();
+
+            if (response === "created") {
+                loginMenuBack.style.display = "none";
+                signUpWelcome.style.display = "grid";    
+            } else if (response === "signedin") {
+                loginMenuBack.style.display = "none";
+                mainUserMenu.style.display = "grid";
+            } else {
+                console.log("Couldn't sign up or login!")
+            }
         }
 
-        signUpBtn.onclick = function () { 
-            loginMenuBack.style.display = "none"; //this is temporary, need to make front end first... //
-            signUpWelcome.style.display = "grid";
+        signUpBtn.onclick = async function () { 
             usernameInp = usernameEl.value;
             passwordInp = passwordEl.value;
+
+            const response = await createSignUpIfNeeded();
+
+            if (response === "created") {
+                loginMenuBack.style.display = "none";
+                signUpWelcome.style.display = "grid";    
+            } else if (response === "signedin") {
+                loginMenuBack.style.display = "none";
+                mainUserMenu.style.display = "grid";
+                const snap = await getDoc(doc(db, "users", uuid, "userData", "basics"));
+                if (snap.exists()) {
+                    const data = snap.data();
+                    username = data.username;
+                    userWelcome.innerText = "Hello " + username + "!";
+                    tasks = data.tasks;
+                }
+            } else {
+                console.log("Couldn't sign up or login!")
+            }
         }
 
-        goToMainBtn.onclick = function () {
+        goToMainBtn.onclick = async function () {
             signUpWelcome.style.display = "none";
             mainUserMenu.style.display = "grid";
             username = userNicknameInp.value;
             userWelcome.innerText = "Hello " + username + "!";
+            try {
+                await setDoc(doc(db, "users", uuid, "userData", "basics"), {
+                    username: username,
+                    tasks: 0
+                })
+            } catch (error) {
+                console.log("data didn't set!")
+            }
+        }
+
+        async function createSignUpIfNeeded() {
+            try {
+                const credential = await createUserWithEmailAndPassword(auth, usernameInp, passwordInp);
+                uuid = credential.user.uid;
+                return "created"
+            } catch (error) {
+                if (error.code === "auth/email-already-in-use") {
+                    try {
+                        const credential = await signInWithEmailAndPassword(auth, usernameInp, passwordInp);
+                        uuid = credential.user.uid;
+                        return "signedin"
+                    } catch (error) {
+                        console.log("Something went wrong...")
+                    }
+                } else {
+                    console.log("Something went wrong...")
+                    throw error;
+                }
+            }
         }
     </script>
 </body>
