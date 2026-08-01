@@ -81,9 +81,9 @@
         <h1> Welcome to ScwTracker! </h1>
         <h3> A Lightweight task tracker for students, employees, and busy parents alike!</h3>
         <br>
-        <label for="username">Email:</label><input id="username" type="text" maxlength="35">
+        <label for="username">Email:</label><input id="username" type="text" minlength="11" maxlength="35">
         <br>
-        <label for="password">Password:</label><input id="password" type="password" maxlength="20">
+        <label for="password">Password:</label><input id="password" type="password" minlength="6" maxlength="20">
         <br>
         <button id="loginBtn" class="sbmt">Login...</button> 
         <br>
@@ -231,10 +231,10 @@
                         uuid = credential.user.uid;
                         return "signedin"
                     } catch (error) {
-                        console.log("Something went wrong...")
+                        console.error(error);
                     }
                 } else {
-                    console.log("Something went wrong...")
+                    console.error(error);
                     throw error;
                 }
             }
@@ -251,6 +251,7 @@
                 }
             } catch (error) {
                 console.log("User data couldn't be loaded!")
+                console.error(error);
             }
         }
 
@@ -262,6 +263,7 @@
                 })
             } catch (error) {
                 console.log("Data didn't set!")
+                console.error(error);
             }
         }
     </script>
