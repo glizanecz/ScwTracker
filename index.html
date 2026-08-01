@@ -112,6 +112,7 @@
         const loginBtn = document.getElementById("loginBtn");
         const signUpBtn = document.getElementById("signUpBtn");
         //Elements for sign up welcome
+        const userNicknameInp = document.getElementById("userNickname");
         const goToMainBtn = document.getElementById("goToMainBtn");
         //Elements for main user menu
         const userWelcome = document.getElementById("userWelcome");
@@ -119,18 +120,21 @@
         const addTaskBtn = document.getElementById("addTaskBtn");
 
         //Variables for whole project
-        let username = "Iyazzy";
+        let username = "somethin"
         let tasks = 0;
         //Variables for sign up & login
         let usernameInp = null;
         let passwordInp = null;
+        //Variables for welcome sign up
+
+
 
         loginBtn.onclick = function () { 
             loginMenuBack.style.display = "none"; //this is temporary, need to make front end first... //
             mainUserMenu.style.display = "grid";
             usernameInp = usernameEl.value;
             passwordInp = passwordEl.value;
-            username = usernameEl;
+            userWelcome.innerText = "Hello " + username + "!";
         }
 
         signUpBtn.onclick = function () { 
@@ -143,6 +147,8 @@
         goToMainBtn.onclick = function () {
             signUpWelcome.style.display = "none";
             mainUserMenu.style.display = "grid";
+            username = userNicknameInp.value;
+            userWelcome.innerText = "Hello " + username + "!";
         }
     </script>
 </body>
