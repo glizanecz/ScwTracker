@@ -77,7 +77,7 @@
         <h1> Welcome to ScwTracker! </h1>
         <h3> A Lightweight task tracker for students, employees, and busy parents alike!</h3>
         <br>
-        <label for="username">Username:</label><input id="username" type="text" maxlength="12">
+        <label for="username">Email:</label><input id="username" type="text" maxlength="12">
         <br>
         <label for="password">Password:</label><input id="password" type="password" maxlength="15">
         <br>
@@ -90,10 +90,15 @@
     <div id="signUpWelcome" class="background">
         <h1>Welcome to ScwTracker!</h1>
         <h2>If you need introductions, go to our <a target="_blank" rel="noopener noreferrer" href="https://glizanecz.github.io/ScwTracker/tutorial.html">tutorial page</a>!!</h2>
+        <label for="userNickname">Set a nickname or have one auto generated!</label>
+        <input id="userNickname">
         <button id="goToMainBtn">Dive right in!</button>
     </div>
     <div id="mainUserMenu" class="background">
-        <textarea readonly placeholder="You currently don't have any tasks, get started by pressing the plus button..."></textarea>
+        <h1 id="userWelcome">Hello!</h1>
+        <h2>View all your tasks below!</h2>
+        <textarea readonly placeholder="You currently don't have any tasks, get started by pressing the button..." id="taskList"></textarea>
+        <button id="addTaskBtn">Add A Task!</button>
     </div>
     <script type="module">
         //Sections
@@ -102,21 +107,37 @@
         signUpWelcome.style.display = "none";
         const mainUserMenu = document.getElementById("mainUserMenu");
         //Elements for sign up & login
-        const username = document.getElementById("username");
-        const password = document.getElementById("password");
+        const usernameEl = document.getElementById("username");
+        const passwordEl = document.getElementById("password");
         const loginBtn = document.getElementById("loginBtn");
         const signUpBtn = document.getElementById("signUpBtn");
         //Elements for sign up welcome
         const goToMainBtn = document.getElementById("goToMainBtn");
+        //Elements for main user menu
+        const userWelcome = document.getElementById("userWelcome");
+        const taskList = document.getElementById("taskList");
+        const addTaskBtn = document.getElementById("addTaskBtn");
+
+        //Variables for whole project
+        let username = "Iyazzy";
+        let tasks = 0;
+        //Variables for sign up & login
+        let usernameInp = null;
+        let passwordInp = null;
 
         loginBtn.onclick = function () { 
             loginMenuBack.style.display = "none"; //this is temporary, need to make front end first... //
             mainUserMenu.style.display = "grid";
+            usernameInp = usernameEl.value;
+            passwordInp = passwordEl.value;
+            username = usernameEl;
         }
 
         signUpBtn.onclick = function () { 
             loginMenuBack.style.display = "none"; //this is temporary, need to make front end first... //
             signUpWelcome.style.display = "grid";
+            usernameInp = usernameEl.value;
+            passwordInp = passwordEl.value;
         }
 
         goToMainBtn.onclick = function () {
