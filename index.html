@@ -180,17 +180,13 @@
             usernameInp = usernameEl.value;
             passwordInp = passwordEl.value;
 
-            const response = await createSignUpIfNeeded();
+            const response = await login();
 
-            if (response === "created") {
+            if (response === "signedin") {
                 loginMenuBack.style.display = "none";
                 signUpWelcome.style.display = "grid";    
-            } else if (response === "signedin") {
-                loginMenuBack.style.display = "none";
-                mainUserMenu.style.display = "grid";
-                await loadUserData();
             } else {
-                console.log("Couldn't sign up or login!")
+                console.log("Couldn't login!")
             }
         }
 
@@ -198,17 +194,13 @@
             usernameInp = usernameEl.value;
             passwordInp = passwordEl.value;
 
-            const response = await createSignUpIfNeeded();
+            const response = await signUp();
 
             if (response === "created") {
                 loginMenuBack.style.display = "none";
                 signUpWelcome.style.display = "grid";    
-            } else if (response === "signedin") {
-                loginMenuBack.style.display = "none";
-                mainUserMenu.style.display = "grid";
-                await loadUserData();
             } else {
-                console.log("Couldn't sign up or login!")
+                console.log("Couldn't sign up!")
             }
         }
 
@@ -220,27 +212,30 @@
             await setUserBasicsData()
         }
 
-        async function createSignUpIfNeeded() {
+        async function signUp() {
             try {
                 const credential = await createUserWithEmailAndPassword(auth, usernameInp, passwordInp);
                 uuid = credential.user.uid;
                 return "created"
             } catch (error) {
-                if (error.code === "auth/email-already-in-use") {
-                    try {
-                        const credential = await signInWithEmailAndPassword(auth, usernameInp, passwordInp);
-                        uuid = credential.user.uid;
-                        return "signedin"
-                    } catch (error) {
-                        console.error(error.code);
-                        console.error(error.message);
-                    }
-                } else {
-                    console.error(error);
-                    throw error;
-                }
+                console.error(error);
+                throw error;
             }
         }
+
+        async function login() {
+            try {
+                const credential = await signInWithEmailAndPassword(auth, usernameInp, passwordInp);
+                uuid = credential.user.uid;
+                return "signedin"
+            } catch (error) {
+                console.error(error);
+                throw error;
+            }
+        }
+
+
+
 
         async function loadUserData() {
             try {
