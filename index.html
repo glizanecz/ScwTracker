@@ -56,6 +56,15 @@
         textarea::placeholder {
             color: black;
         }
+
+        textarea {
+            display: flex;
+            background-color: grey; 
+            min-height: fit-content; 
+            min-width: fit-content; 
+            font: black;
+            flex: 1;
+        }
     </style>
 </head>
 <body>
@@ -77,7 +86,7 @@
         <button id="goToMainBtn">Dive right in!</button>
     </div>
     <div id="mainUserMenu" class="background">
-        <textarea style="background-color: grey; height: fit-content; width: fit-content; font: black;" placeholder="You currently don't have any tasks, get started by pressing the plus button..."></textarea>
+        <textarea placeholder="You currently don't have any tasks, get started by pressing the plus button..."></textarea>
     </div>
     <script type="module">
         //Sections
