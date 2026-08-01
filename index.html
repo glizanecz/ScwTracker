@@ -102,6 +102,7 @@
     </div>
     <div id="mainUserMenu" class="background">
         <h1 id="userWelcome">Hello!</h1>
+        <button id="changeUsername">Change Username...</button>
         <h2>View all your tasks below!</h2>
         <textarea readonly placeholder="You currently don't have any tasks, get started by pressing the button..." id="taskList"></textarea>
         <br>
@@ -162,6 +163,7 @@
         const goToMainBtn = document.getElementById("goToMainBtn");
         //Elements for main user menu
         const userWelcome = document.getElementById("userWelcome");
+        const changeUsername = document.getElementById("changeUsername");
         const taskList = document.getElementById("taskList");
         const addTaskBtn = document.getElementById("addTaskBtn");
 
@@ -174,7 +176,29 @@
         let passwordInp = null;
         //Variables for welcome sign up
 
+        changeUsername.onclick = function () {
+          let usernamePrompt = prompt("What would your username to be?");
+          if (isTextProfane(usernamePrompt) === true) {
+            alert("Username is profane and invalid!")
+            while (usernamePrompt.length > 12 || usernamePrompt.length === 0 || isTextProfane(usernamePrompt) || usernamePrompt == null) {
+              usernamePrompt = prompt("Please choose another username...");
+            }
+          } else if (usernamePrompt.length > 12) {
+            alert("Username can't be over 12 characters!")
+            while (usernamePrompt.length > 12 || usernamePrompt.length === 0 || isTextProfane(usernamePrompt) || usernamePrompt == null) {
+              usernamePrompt = prompt("Please choose another username...");
+            }
+          } else if (usernamePrompt.length === 0) {
+            alert("Username can't be nothing!")
+            while (usernamePrompt.length > 12 || usernamePrompt.length === 0 || isTextProfane(usernamePrompt) || usernamePrompt == null) {
+              usernamePrompt = prompt("Please choose another username...");
+            }
+          } else {
+            username = usernamePrompt.replaceAll(" ", "");
+            alert("Username set to " + username + "!")
+          } 
 
+        }
 
         loginBtn.onclick = async function () { 
             usernameInp = usernameEl.value;
