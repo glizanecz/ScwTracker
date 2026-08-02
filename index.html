@@ -23,6 +23,7 @@
 
         <h6> ScwTracker | Copyright 2026 ⓒ </h6>
     </div>
+
     <div id="signUpWelcome" class="background">
         <h1>Welcome to ScwTracker!</h1>
         <h2>If you need introductions, go to our <a target="_blank" rel="noopener noreferrer" href="https://glizanecz.github.io/ScwTracker/tutorial.html">tutorial page</a>!!</h2>
@@ -32,6 +33,7 @@
         <br>
         <button id="goToMainBtn">Dive right in!</button>
     </div>
+
     <div id="mainUserMenu" class="background">
         <h1 id="userWelcome">Hello!</h1>
         <button id="changeUsername">Change Username...</button>
@@ -39,6 +41,12 @@
         <textarea readonly placeholder="You currently don't have any tasks, get started by pressing the button..." id="taskList"></textarea>
         <br>
         <button id="addTaskBtn">Add A Task!</button>
+    </div>
+
+    <div id="addTaskMenu" class="background">
+        <label for="projNameInp">Enter the name of your project...</label><input id="projNameInp" placeholder="Math homework #2"> 
+        <label for="projDescInp">Enter the description of your project...</label><textarea id="projDescInp" placeholder="This is important!"> 
+        <label for="projColabInp">Add collaborators (collaborators must accept a friend request before joining)</label><input id="projColabInp" placeholder="Jeremy92, Jamie9, etc...">
     </div>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
@@ -85,6 +93,8 @@
         signUpWelcome.style.display = "none";
         const mainUserMenu = document.getElementById("mainUserMenu");
         mainUserMenu.style.display = "none";
+        const addTaskMenu = document.getElementById("addTaskMenu");
+        addTaskMenu.style.display = "none";
         //Elements for sign up & login
         const usernameEl = document.getElementById("username");
         const passwordEl = document.getElementById("password");
@@ -98,15 +108,26 @@
         const changeUsername = document.getElementById("changeUsername");
         const taskList = document.getElementById("taskList");
         const addTaskBtn = document.getElementById("addTaskBtn");
+        //Elements for add task menu
+        const projNameInp = document.getElementById("projNameInp");
+        const projDescInp = document.getElementById("projDescInp");
+        const projColabInp = document.getElementById("projColabInp");
 
         //Variables for whole project
-        let username = "somethin"
+        let username = "username01";
+        let userEmail = "username01@gmail.com";
         let tasks = 0;
         let uuid = null;
         //Variables for sign up & login
         let usernameInp = null;
         let passwordInp = null;
-        //Variables for welcome sign up
+        //Variables for add task menu
+        let projName = null;
+        let projDesc = "";
+        let projDueDate = "01/01/2000";
+        let projImages = [];
+        let projContributors = [];
+
 
         changeUsername.onclick = async function () {
           let usernamePrompt = prompt("What would your username to be?");
@@ -135,7 +156,10 @@
         }
 
         addTaskBtn.onclick = async function () {
-
+            if (uuid !== null && uuid !== undefined) {
+                mainUserMenu.style.display = "none";
+                addTaskMenu.style.display = "grid";
+            }
         }
 
         loginBtn.onclick = async function () { 
@@ -206,10 +230,12 @@
 
         async function loadUserData() {
             try {
+                userEmail = usernameInp;
                 const snap = await getDoc(doc(db, "users", uuid, "userData", "basics"));
                 if (snap.exists()) {
                     const data = snap.data();
                     username = data.username;
+                    userEmail = data.userEmail;
                     userWelcome.innerText = "Hello " + username + "!";
                     tasks = data.tasks;
                 }
@@ -223,8 +249,10 @@
             try {
                 console.log("UUID:", uuid);
                 console.log("Saving:", username);
+                userEmail = usernameInp;
                 await setDoc(doc(db, "users", uuid, "userData", "basics"), {
                     username: username,
+                    userEmail: userEmail,
                     tasks: 0,
                     projects: []
                 })
