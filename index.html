@@ -303,7 +303,7 @@
 
         async function setUserBasicsData() {
             try {
-                const snapshot = await getDoc(doc(db, uuid, "userData", "basics"))
+                const snapshot = await getDoc(doc(db, "users", uuid, "userData", "basics"))
                 if (snapshot.exists()) {
                     await updateDoc(doc(db, "users", uuid, "userData", "basics"), {
                         username: username,
