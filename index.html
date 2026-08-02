@@ -144,7 +144,7 @@
             projContributors = projColabInp.value
             projContributors = projContributors.replaceAll(" ", "").split(",")
             projColabInp.value = "";
-            await setDoc(doc(db, "users", uuid, projName), {
+            await setDoc(doc(db, "users", uuid, "projects", projName), {
                 projName: projName,
                 projDesc: projDesc,
                 projDueDate: projDueDate,
