@@ -142,7 +142,7 @@
             projDueDate = projDueDateInp.value;
             projDueDateInp.value = "";
             projContributors = projColabInp.value
-            projContributors = projContributors.split(",").replace(" ", "")
+            projContributors = projContributors.replaceAll(" ", "").split(",")
             projColabInp.value = "";
             await setDoc(doc(db, "users", uuid, projName), {
                 projName: projName,
