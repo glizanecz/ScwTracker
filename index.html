@@ -144,7 +144,7 @@
 
         projCreateBtn.onclick = async function () {
             projName = projNameInp.value;
-            taskList.innerText += "•" + projName + "\n";
+            taskList.innerText += "• " + projName + '\n';
             projNameInp.value = "";
             projDesc = projDescInp.value;
             projDescInp.value = "";
@@ -290,7 +290,7 @@
                     })
 
                     taskVisualList.forEach((listItem) => {
-                        taskList.innerText += "•" + listItem + "\n";
+                        taskList.innerText += "• " + listItem + '\n';
                     })
                 }
             } catch (error) {
