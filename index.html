@@ -6,7 +6,7 @@
     <title>ScwTracker</title>
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="test.css"> <!-- im changing this back, trying out something ai generated lol -->
 </head>
 <body>
     <div id="loginMenuBack" class="background">
@@ -47,6 +47,8 @@
         <label for="projNameInp">Enter the name of your project...</label><input id="projNameInp" placeholder="Math homework #2"> 
         <label for="projDescInp">Enter the description of your project...</label><textarea id="projDescInp" placeholder="This is important!"></textarea>
         <label for="projColabInp">Add collaborators (collaborators must accept a friend request before joining)</label><input id="projColabInp" placeholder="Jeremy92, Jamie9, etc...">
+        <label for="projImgInp">Insert up to two images...</label><input id="projImgInp" type="image">
+        <button id="projCreateBtn">Create Task</button>
     </div>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
@@ -112,6 +114,8 @@
         const projNameInp = document.getElementById("projNameInp");
         const projDescInp = document.getElementById("projDescInp");
         const projColabInp = document.getElementById("projColabInp");
+        const projImpInp = document.getElementById("projImgInp");
+        const projCreateBtn = document.getElementById("projCreateBtn");
 
         //Variables for whole project
         let username = "username01";

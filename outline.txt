@@ -1,0 +1,35 @@
+ok so for friends list thingy, this is gonna take some thinking.
+this isn't interesting, im just breaking apart the problem into small managable bits so i can work it out.
+
+#1: we need to make sure usernames are UNIQUE (although emails can work, users aren't known by them)
+    Subtask: it would be helpful if users could also use email to find people
+
+For #1: im thinking i make a username list that is updated on Firebase, letting the tab read if a username is taken or not, this would make
+usernames unique and unrepeatable. idk if i can do this but im thinking of using queries to determine which user ids have certain emails,
+this is how i could make the WHOLE system work. the username list should be usernames (with their uuids and emails in their fields?)
+
+#2: users need to recieve a friend request
+    Subtask: if accepted/denied, the users need to stay seperate/be added together
+    Subtask: add unfriend that removes friend status from other users account (this goes both ways)
+
+For #2: im thinking that i could just make a really simple firebase rule that allows users to request data changes in other uuid's friend requests
+document if they have the uuid. then, if accepted, the request would be deleted and then put into a friends list. i think i should also have
+statuses to requests (accepted, denied, pending, blocked), because it would allow more control and history to the app instead of doing
+all of the stuff blindly. blocked would let the user requested say that they don't want any more requests.
+
+#3: make it so ONLY friends can start projects together
+
+For #3: really not hard at all, when loadUserData() starts, it will also just check the user's friendlist and return it into the client
+tab. this creates an array that is checked before letting users send post requests to firebase (also adding a firebase rule that checks
+if the user is friended)
+
+#4: when the projects are created, friends need to have a shared document that is edited in realtime with onSnapshot
+
+For #4: a new project is created off users and it's a new project collection (for example, userA creates a project and it auto gens a
+name "project0394") then, each user has an array of projects they're included in. idk how users would be removed tho.
+
+#5: users need to know when they're offline (maybe add offline edits that post or just lock project editing?)
+
+For #5: navigator.onLine literally returns true or false if the user is online or offline, should be easy, just lock requests. this shouldn't
+need a firebase rule because literally nothing would be saved. only thing im worried about is that two users could edit at once? maybe it could
+prompt each user about conflicting changes like vscode does.
