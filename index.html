@@ -48,6 +48,10 @@
         <label for="projDescInp">Enter the description of your project...</label><textarea id="projDescInp" placeholder="This is important!"></textarea>
         <label for="projColabInp">Add collaborators (collaborators must accept a friend request before joining)</label><input id="projColabInp" placeholder="Jeremy92, Jamie9, etc...">
         <label for="projImgInp">Insert up to two images...</label><input id="projImgInp" type="image">
+        <input type="number" max="30" min="1" id="projDayInp"><h4>/</h4><input type="number" max="12" min="1" id="projMonthInp"><h4>/</h4><input type="number" max="2045" min="2026" id="projYearInp"><h4>    </h4><input type="number" max="12" min="1"><h4> : </h4><input type="number" max="59" min="0"><h4>     </h4><select>
+            <option>AM</option>
+            <option>PM</option>
+        </select>
         <button id="projCreateBtn">Create Task</button>
     </div>
     <script type="module">
@@ -114,7 +118,10 @@
         const projNameInp = document.getElementById("projNameInp");
         const projDescInp = document.getElementById("projDescInp");
         const projColabInp = document.getElementById("projColabInp");
-        const projImpInp = document.getElementById("projImgInp");
+        const projImgInp = document.getElementById("projImgInp");
+        const projDayInp = document.getElementById("projDayInp");
+        const projMonthInp = document.getElementById("projMonthInp");
+        const projYearInp = document.getElementById("projYearInp");
         const projCreateBtn = document.getElementById("projCreateBtn");
 
         //Variables for whole project
@@ -128,9 +135,33 @@
         //Variables for add task menu
         let projName = null;
         let projDesc = "";
-        let projDueDate = "01/01/2000";
+        let projDay = 1;
+        let projMonth = 1;
+        let projYear = 2026;
+        let projMin = 1;
+        let projHour = 12;
+        let projDaySect = "AM"
+        let projDueDate = "01/01/2026 12:00AM";
         let projImages = [];
         let projContributors = [];
+
+        projCreateBtn.onclick = async function () {
+            projName = projNameInp.value;
+            projNameInp.value = "";
+            projDesc = projDescInp.value;
+            projDescInp.value = "";
+            projDueDate = projDueDateInp.value;
+            projDueDataInp.value = "";
+            await setDoc(doc(db, "users", uuid, projName), {
+                projName: projName,
+                projDesc: projDesc,
+                projDueDate: projDueDate,
+                projImages: projImages,
+                projContributors: projContributors,
+            })
+            addTaskMenu.style.display = "none";
+            mainUserMenu.style.display = "grid";
+        }
 
 
         changeUsername.onclick = async function () {
