@@ -200,9 +200,13 @@
         }
 
         addTaskBtn.onclick = async function () {
-            if (uuid !== null && uuid !== undefined) {
+            if (uuid !== null && uuid !== undefined && navigator.onLine === true) {
                 mainUserMenu.style.display = "none";
                 addTaskMenu.style.display = "grid";
+            } else if (!navigator.onLine) {
+                alert("Your internet is disconnected! Try again later...")
+            } else if (uuid !== null && uuid !== undefined) {
+                alert("Something went wrong, refresh and sign back in!")
             }
         }
 
