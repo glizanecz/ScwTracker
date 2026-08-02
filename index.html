@@ -164,6 +164,8 @@
                 projImages: projImages,
                 projContributors: projContributors,
             })
+            tasks++;
+            await setUserBasicsData();
             addTaskMenu.style.display = "none";
             mainUserMenu.style.display = "grid";
         }
@@ -301,16 +303,24 @@
 
         async function setUserBasicsData() {
             try {
-                console.log("UUID:", uuid);
-                console.log("Saving:", username);
-                userEmail = usernameInp;
-                await setDoc(doc(db, "users", uuid, "userData", "basics"), {
-                    username: username,
-                    userEmail: userEmail,
-                    tasks: 0,
-                    projects: []
-                })
-                console.log("Saved!");
+                const snapshot = await getDoc(doc(db, uuid, "userData", "basics"))
+                if (snapshot.exists()) {
+                    await updateDoc(doc(db, "users", uuid, "userData", "basics"), {
+                        username: username,
+                        tasks: tasks,
+                    })
+                } else {
+                    console.log("UUID:", uuid);
+                    console.log("Saving:", username);
+                    userEmail = usernameInp;
+                    await setDoc(doc(db, "users", uuid, "userData", "basics"), {
+                        username: username,
+                        userEmail: userEmail,
+                        tasks: 0,
+                        projects: []
+                    })
+                    console.log("Saved!");
+                }
             } catch (error) {
                 console.log("Data didn't set!")
                 console.error(error);
