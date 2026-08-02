@@ -94,6 +94,7 @@
         const analytics = getAnalytics(app);
         const auth = getAuth(app);
         const db = getFirestore(app);
+        const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
         //Sections
         const loginMenuBack = document.getElementById("loginMenuBack");
@@ -132,6 +133,8 @@
         let taskCollection = [];
         let taskVisualList = [];
         let uuid = null;
+        let usernameCoolSeconds = 0;
+        let usernameSetCooldown = false;
         //Variables for sign up & login
         let usernameInp = null;
         let passwordInp = null;
@@ -167,36 +170,51 @@
                 projContributors: projContributors,
             })
             tasks++;
-            await setUserBasicsData();
+            await setUserBasicsData(0);
             addTaskMenu.style.display = "none";
             mainUserMenu.style.display = "grid";
         }
 
 
         changeUsername.onclick = async function () {
-          let usernamePrompt = prompt("What would your username to be?");
-          if (isTextProfane(usernamePrompt) === true) {
-            alert("Username is profane and invalid!")
-            while (usernamePrompt.length > 12 || usernamePrompt.length === 0 || isTextProfane(usernamePrompt) || usernamePrompt == null) {
-              usernamePrompt = prompt("Please choose another username...");
-            }
-          } else if (usernamePrompt.length > 12) {
-            alert("Username can't be over 12 characters!")
-            while (usernamePrompt.length > 12 || usernamePrompt.length === 0 || isTextProfane(usernamePrompt) || usernamePrompt == null) {
-              usernamePrompt = prompt("Please choose another username...");
-            }
-          } else if (usernamePrompt.length === 0) {
-            alert("Username can't be nothing!")
-            while (usernamePrompt.length > 12 || usernamePrompt.length === 0 || isTextProfane(usernamePrompt) || usernamePrompt == null) {
-              usernamePrompt = prompt("Please choose another username...");
+          if (usernameCoolSeconds === 0) {
+            let usernamePrompt = prompt("What would you like your username to be? (enter null or cancel for auto generated.)");
+            if (usernamePrompt !== null) {
+                if (isTextProfane(usernamePrompt) === true) {
+                    alert("Username is profane and invalid!")
+                    while (usernamePrompt.length > 12 || usernamePrompt.length === 0 || isTextProfane(usernamePrompt) || usernamePrompt == null) {
+                    usernamePrompt = prompt("Please choose another username...");
+                    }
+                } else if (usernamePrompt.length > 12) {
+                    alert("Username can't be over 12 characters!")
+                    while (usernamePrompt.length > 12 || usernamePrompt.length === 0 || isTextProfane(usernamePrompt) || usernamePrompt == null) {
+                    usernamePrompt = prompt("Please choose another username...");
+                    }
+                } else if (usernamePrompt.length === 0) {
+                    alert("Username can't be nothing!")
+                    while (usernamePrompt.length > 12 || usernamePrompt.length === 0 || isTextProfane(usernamePrompt) || usernamePrompt == null) {
+                    usernamePrompt = prompt("Please choose another username...");
+                    }
+                } else {
+                    username = usernamePrompt.replaceAll(" ", "");
+                    userWelcome.innerText = "Hello " + username + "!";
+                    await setUserBasicsData(1);
+                    alert("Username set to " + username + "!")
+                } 
+            } else {
+                username = adjectives[Math.floor(Math.random() * adjectives.length)] + nouns[Math.floor(Math.random() * nouns.length)] + String(Math.floor(Math.random() * 10000));
+                userWelcome.innerText = "Hello " + username + "!";
+                await setUserBasicsData(1);
+                usernameCoolSeconds += 120;
+                alert("Username set to " + username + "!");
             }
           } else {
-            username = usernamePrompt.replaceAll(" ", "");
-            userWelcome.innerText = "Hello " + username + "!";
-            await setUserBasicsData();
-            alert("Username set to " + username + "!")
-          } 
-
+            if (usernameCoolSeconds === 1) {
+                alert("You cannot set your username for another 1 second!");
+            } else {
+                alert("You cannot set your username for another " + usernameCoolSeconds + " seconds!"); 
+            }
+          }
         }
 
         addTaskBtn.onclick = async function () {
@@ -253,7 +271,7 @@
                 username = adjectives[Math.floor(Math.random() * adjectives.length)] + nouns[Math.floor(Math.random() * nouns.length)] + String(Math.floor(Math.random() * 10000));
             }
             userWelcome.innerText = "Hello " + username + "!";
-            await setUserBasicsData()
+            await setUserBasicsData(0)
         }
 
         async function signUp() {
@@ -315,14 +333,20 @@
             }
         }
 
-        async function setUserBasicsData() {
+        async function setUserBasicsData(timestampInclude) {
             try {
                 const snapshot = await getDoc(doc(db, "users", uuid, "userData", "basics"))
-                if (snapshot.exists()) {
+                if (snapshot.exists() && timestampInclude === 1) {
                     await updateDoc(doc(db, "users", uuid, "userData", "basics"), {
                         username: username,
                         tasks: tasks,
+                        usernameCooldown: serverTimestamp(),
                     })
+                } else if (snapshot.exists()) {
+                    await updateDoc(doc(db, "users", uuid, "userData", "basics"), {
+                        username: username,
+                        tasks: tasks,
+                    })       
                 } else {
                     console.log("UUID:", uuid);
                     console.log("Saving:", username);
@@ -330,6 +354,7 @@
                     await setDoc(doc(db, "users", uuid, "userData", "basics"), {
                         username: username,
                         userEmail: userEmail,
+                        creationDate: serverTimestamp(),
                         tasks: 0,
                         projects: []
                     })
@@ -389,6 +414,20 @@
             
             return false
         }
+
+        async function usernameCooldownStart() {
+            while (true) {
+                await sleep(1000);
+                if (usernameCoolSeconds > 0) {
+                    usernameSetCooldown = true;
+                    usernameCoolSeconds--
+                } else {
+                    usernameSetCooldown = false;
+                }
+            }
+        }
+
+        usernameCooldownStart()
     </script>
 </body>
 </html>
