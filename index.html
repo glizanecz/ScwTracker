@@ -279,7 +279,7 @@
                     tasks = data.tasks;
                 }
                 const snapshot = await getDocs(collection(db, "users", uuid, "projects"))
-                if (snapshot.exists()) {
+                if (!snapshot.empty) {
                     snapshot.forEach((doc) => {
                         taskCollection.push(doc.data())
                     });
