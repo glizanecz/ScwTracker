@@ -72,6 +72,8 @@
             updateDoc,
             increment,
             serverTimestamp,
+            collection,
+            getDocs,
         } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";  
 
         const firebaseConfig = {
@@ -276,7 +278,7 @@
                     userWelcome.innerText = "Hello " + username + "!";
                     tasks = data.tasks;
                 }
-                const snapshot = await getDoc(collection(db, "users", uuid, "projects"))
+                const snapshot = await getDocs(collection(db, "users", uuid, "projects"))
                 if (snapshot.exists()) {
                     snapshot.forEach((doc) => {
                         taskCollection.push(doc.data())
