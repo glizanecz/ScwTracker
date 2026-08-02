@@ -29,7 +29,7 @@
         <h2>If you need introductions, go to our <a target="_blank" rel="noopener noreferrer" href="https://glizanecz.github.io/ScwTracker/tutorial.html">tutorial page</a>!!</h2>
         <label for="userNickname">Set a nickname or have one auto generated!</label>
         <br>
-        <input id="userNickname">
+        <input id="userNickname" maxlength="12">
         <br>
         <button id="goToMainBtn">Dive right in!</button>
     </div>
@@ -76,6 +76,7 @@
             serverTimestamp,
             collection,
             getDocs,
+            onSnapshot,
         } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";  
 
         const firebaseConfig = {
@@ -146,33 +147,38 @@
         let projDueTime = "";
         let projImages = [];
         let projContributors = [];
+        let projCreateLock = 0;
 
         projCreateBtn.onclick = async function () {
-            projName = projNameInp.value;
-            taskList.value += "• " + projName + '\n';
-            projNameInp.value = "";
-            projDesc = projDescInp.value;
-            projDescInp.value = "";
-            projDueDate = projDueDateInp.value;
-            projDueDateInp.value = "";
-            projDueTime = projDueTimeInp.value;
-            projDueTimeInp.value = "";
-            projContributors = projColabInp.value
-            projContributors = projContributors.replaceAll(" ", "").split(",")
-            projColabInp.value = "";
-            projectID = "proj" + (tasks + 1)
-            await setDoc(doc(db, "users", uuid, "projects", projectID), {
-                projName: projName,
-                projDesc: projDesc,
-                projDueDate: projDueDate,
-                projDueTime: projDueTime,
-                projImages: projImages,
-                projContributors: projContributors,
-            })
-            tasks++;
-            await setUserBasicsData(0);
-            addTaskMenu.style.display = "none";
-            mainUserMenu.style.display = "grid";
+            if (projCreateLock = 0) {
+                projCreateLock = 1;
+                projName = projNameInp.value;
+                taskList.value += "• " + projName + '\n';
+                projNameInp.value = "";
+                projDesc = projDescInp.value;
+                projDescInp.value = "";
+                projDueDate = projDueDateInp.value;
+                projDueDateInp.value = "";
+                projDueTime = projDueTimeInp.value;
+                projDueTimeInp.value = "";
+                projContributors = projColabInp.value
+                projContributors = projContributors.replaceAll(" ", "").split(",")
+                projColabInp.value = "";
+                projectID = "proj" + (tasks + 1)
+                await setDoc(doc(db, "users", uuid, "projects", projectID), {
+                    projName: projName,
+                    projDesc: projDesc,
+                    projDueDate: projDueDate,
+                    projDueTime: projDueTime,
+                    projImages: projImages,
+                    projContributors: projContributors,
+                })
+                tasks++;
+                await setUserBasicsData(0);
+                addTaskMenu.style.display = "none";
+                mainUserMenu.style.display = "grid";
+                projCreateLock = 0;
+            }
         }
 
 
@@ -183,22 +189,38 @@
                 if (isTextProfane(usernamePrompt) === true) {
                     alert("Username is profane and invalid!")
                     while (usernamePrompt.length > 12 || usernamePrompt.length === 0 || isTextProfane(usernamePrompt) || usernamePrompt == null) {
-                    usernamePrompt = prompt("Please choose another username...");
+                        usernamePrompt = prompt("Please choose another username...");
                     }
+                    username = usernamePrompt.replaceAll(" ", "");
+                    userWelcome.innerText = "Hello " + username + "!";
+                    await setUserBasicsData(1);
+                    usernameCoolSeconds += 120;
+                    alert("Username set to " + username + "!")
                 } else if (usernamePrompt.length > 12) {
                     alert("Username can't be over 12 characters!")
                     while (usernamePrompt.length > 12 || usernamePrompt.length === 0 || isTextProfane(usernamePrompt) || usernamePrompt == null) {
-                    usernamePrompt = prompt("Please choose another username...");
+                        usernamePrompt = prompt("Please choose another username...");
                     }
+                    username = usernamePrompt.replaceAll(" ", "");
+                    userWelcome.innerText = "Hello " + username + "!";
+                    await setUserBasicsData(1);
+                    usernameCoolSeconds += 120;
+                    alert("Username set to " + username + "!")
                 } else if (usernamePrompt.length === 0) {
                     alert("Username can't be nothing!")
                     while (usernamePrompt.length > 12 || usernamePrompt.length === 0 || isTextProfane(usernamePrompt) || usernamePrompt == null) {
-                    usernamePrompt = prompt("Please choose another username...");
+                        usernamePrompt = prompt("Please choose another username...");
                     }
+                    username = usernamePrompt.replaceAll(" ", "");
+                    userWelcome.innerText = "Hello " + username + "!";
+                    await setUserBasicsData(1);
+                    usernameCoolSeconds += 120;
+                    alert("Username set to " + username + "!")
                 } else {
                     username = usernamePrompt.replaceAll(" ", "");
                     userWelcome.innerText = "Hello " + username + "!";
                     await setUserBasicsData(1);
+                    usernameCoolSeconds += 120;
                     alert("Username set to " + username + "!")
                 } 
             } else {
@@ -296,7 +318,23 @@
             }
         }
 
+        onSnapshot(collection(db, "users", uuid, "projects"), (snapshot) => {
+            taskCollection = [];
+            taskVisualList = [];
+            taskList.value = "";
+            
+            snapshot.forEach((doc) => {
+                taskCollection.push(doc.data())
+            });
 
+            taskCollection.forEach((project) => {
+                taskVisualList.push(project.projName)
+            })
+
+            taskVisualList.forEach((listItem) => {
+                taskList.value += "• " + listItem + '\n';
+            })
+        })
 
 
         async function loadUserData() {
@@ -355,7 +393,7 @@
                         username: username,
                         userEmail: userEmail,
                         creationDate: serverTimestamp(),
-                        tasks: 0,
+                        tasks: tasks,
                         projects: []
                     })
                     console.log("Saved!");
