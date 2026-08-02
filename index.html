@@ -6,78 +6,7 @@
     <title>ScwTracker</title>
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-
-    <style>
-        body {
-            display: grid;
-            place-items: center;
-            background-color: dimgrey;
-            min-height: 100dvh;
-            padding: 12px;
-            box-sizing: border-box;
-            margin: 0;
-            font-family: Verdana, Geneva, Tahoma, sans-serif;
-        }
-
-        .background {
-            background-color: rgb(177, 176, 176);
-            padding: 20px;
-            width: 100%;
-            height: 100%;
-            max-height: calc(100% - 30px);
-            max-width: calc(100% - 30px);
-            box-sizing: border-box;
-            text-align: center;
-            display: grid;
-            place-items: center;
-            align-content: center;
-            border-radius: 10px;
-            border-color: black;
-            row-gap: 15px;
-        }
-
-        input {
-            background-color: rgb(51, 51, 51);
-            border-radius: 5px;
-            border-color: black;
-            color: white;
-            box-sizing: border-box;
-            max-width: 100%;
-        }
-
-        .sbmt {
-            background-color: rgb(51, 51, 51);
-            border-radius: 5px;
-            border-color: black;   
-            color: white; 
-        }
-
-        .sbmt::hover {
-            background-color: rgb(131, 131, 131);
-            border-radius: 5px;
-            border-color: black;    
-        }
-        
-        textarea::placeholder {
-            color: black;
-        }
-
-        textarea {
-            width: 100%;
-            height: 100%;
-            max-height: fit-content;
-            max-width: 500px;
-            min-height: 200px;
-            min-width: fit-content;
-            box-sizing: border-box; 
-            display: flex;
-            background-color: grey; 
-            font: black;
-            resize: none;
-            overflow: auto;
-            overflow-wrap: break-word;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div id="loginMenuBack" class="background">
@@ -205,6 +134,10 @@
 
         }
 
+        addTaskBtn.onclick = async function () {
+
+        }
+
         loginBtn.onclick = async function () { 
             usernameInp = usernameEl.value;
             passwordInp = passwordEl.value;
@@ -292,7 +225,8 @@
                 console.log("Saving:", username);
                 await setDoc(doc(db, "users", uuid, "userData", "basics"), {
                     username: username,
-                    tasks: 0
+                    tasks: 0,
+                    projects: []
                 })
                 console.log("Saved!");
             } catch (error) {
