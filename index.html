@@ -204,7 +204,12 @@
                 mainUserMenu.style.display = "none";
                 addTaskMenu.style.display = "grid";
             } else if (!navigator.onLine) {
-                alert("Your internet is disconnected! Try again later...")
+                usernameInp.value = "";
+                passwordInp.value = "";
+                mainUserMenu.style.display = "none";
+                loginMenuBack.style.display = "grid";
+                signOut(auth)
+                alert("Your internet disconnected! Reconnect and sign back in!")
             } else if (uuid !== null && uuid !== undefined) {
                 alert("Something went wrong, refresh and sign back in!")
             }
