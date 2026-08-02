@@ -49,6 +49,7 @@
         <label for="projColabInp">Add collaborators (collaborators must accept a friend request before joining)</label><input id="projColabInp" placeholder="Jeremy92, Jamie9, etc...">
         <label for="projImgInp">Insert up to two images...</label><input id="projImgInp" type="image">
         <label for="projDueDateInp">Select a due date...</label><input id="projDueDateInp" type="date">
+        <label for="projDueTimeInp">Select a time due...</label><input id="projDueTimeInp" type="time" step="1">
         <button id="projCreateBtn">Create Task</button>
     </div>
     <script type="module">
@@ -117,6 +118,7 @@
         const projColabInp = document.getElementById("projColabInp");
         const projImgInp = document.getElementById("projImgInp");
         const projDueDateInp = document.getElementById("projDueDateInp");
+        const projDueTimeInp = document.getElementById("projDueTimeInp");
         const projCreateBtn = document.getElementById("projCreateBtn");
 
         //Variables for whole project
@@ -131,6 +133,7 @@
         let projName = null;
         let projDesc = "";
         let projDueDate = "";
+        let projDueTime = "";
         let projImages = [];
         let projContributors = [];
 
@@ -141,6 +144,8 @@
             projDescInp.value = "";
             projDueDate = projDueDateInp.value;
             projDueDateInp.value = "";
+            projDueTime = projDueTimeInp.value;
+            projDueTimeInp.value = "";
             projContributors = projColabInp.value
             projContributors = projContributors.replaceAll(" ", "").split(",")
             projColabInp.value = "";
@@ -148,6 +153,7 @@
                 projName: projName,
                 projDesc: projDesc,
                 projDueDate: projDueDate,
+                projDueTime: projDueTime,
                 projImages: projImages,
                 projContributors: projContributors,
             })
