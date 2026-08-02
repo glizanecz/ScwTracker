@@ -125,12 +125,15 @@
         let username = "username01";
         let userEmail = "username01@gmail.com";
         let tasks = 0;
+        let taskCollection = [];
+        let taskVisualList = [];
         let uuid = null;
         //Variables for sign up & login
         let usernameInp = null;
         let passwordInp = null;
         //Variables for add task menu
         let projName = null;
+        let projectID = "proj1";
         let projDesc = "";
         let projDueDate = "";
         let projDueTime = "";
@@ -149,7 +152,8 @@
             projContributors = projColabInp.value
             projContributors = projContributors.replaceAll(" ", "").split(",")
             projColabInp.value = "";
-            await setDoc(doc(db, "users", uuid, "projects", projName), {
+            projectID = "proj" + (tasks + 1)
+            await setDoc(doc(db, "users", uuid, "projects", projectID), {
                 projName: projName,
                 projDesc: projDesc,
                 projDueDate: projDueDate,
@@ -271,6 +275,20 @@
                     userEmail = data.userEmail;
                     userWelcome.innerText = "Hello " + username + "!";
                     tasks = data.tasks;
+                }
+                const snapshot = await getDoc(collection(db, "users", uuid, "projects"))
+                if (snapshot.exists()) {
+                    snapshot.forEach((doc) => {
+                        taskCollection.push(doc.data())
+                    });
+
+                    taskCollection.forEach((project) => {
+                        taskVisualList.push(project.projName)
+                    })
+
+                    taskVisualList.forEach((listItem) => {
+                        taskList.innerText += "•" + taskVisualList[listItem] + "\n";
+                    })
                 }
             } catch (error) {
                 console.log("User data couldn't be loaded!")
