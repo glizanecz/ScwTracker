@@ -32,5 +32,5 @@ function normalizeDate(stringDate, project) {
         dayEnd = "th";
     }
 
-    return month + " " + day + dayEnd + " " + year
+    return month + " " + day + dayEnd + ", " + year
 }
