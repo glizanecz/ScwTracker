@@ -37,15 +37,20 @@ function normalizeDate(stringDate, project) {
 
 function timeNormalizer(timeString, project) {
     let hourString = timeString.substring(0,2);
-    let hour;
+    let hour = Number(hourString)
     let minuteString = timeString.substring(3,5);
     let minute;
-    let secondString = timeString.substring(4,7);
+    let secondString = timeString.substring(6,8);
     let second;
     let hourEnd = "";
-    if (Number(secondString) === 0) second = "";
-    if (Number(hourString) >= 12 && Number(hourString) < 24) hourEnd = "PM";
-    if ((Number(hourString) >= 0 || Number(hourString) === 24) && Number(hourString) < 12) hourEnd = "AM";
-    let ending = second === "" ? hourEnd : ":" + secondString + " " + hourEnd;
-    return hourString + ":" + minuteString + ending;
+    let displayHour = hour % 12;
+    if (displayHour === 0) displayHour = 12;
+    Number(secondString) === 0 ? second = "" : second = secondString;
+    if (Number(hourString) >= 12 && Number(hourString) < 24) {
+        hourEnd = "PM";
+    } else {
+        hourEnd = "AM";
+    }
+    let ending = second === "" ? hourEnd : ":" + second + " " + hourEnd;
+    return displayHour + ":" + minuteString + ending;
 }
