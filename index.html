@@ -151,7 +151,7 @@
         let projCreateLock = 0;
 
         projCreateBtn.onclick = async function () {
-            if (projCreateLock = 0) {
+            if (projCreateLock === 0) {
                 projCreateLock = 1;
                 projName = projNameInp.value;
                 taskList.value += "• " + projName + '\n';
@@ -365,20 +365,20 @@
                     userWelcome.innerText = "Hello " + username + "!";
                     tasks = data.tasks;
                 }
-                const snapshot = await getDocs(collection(db, "users", uuid, "projects"))
-                if (!snapshot.empty) {
-                    snapshot.forEach((doc) => {
-                        taskCollection.push(doc.data())
-                    });
+                //const snapshot = await getDocs(collection(db, "users", uuid, "projects"))
+                //if (!snapshot.empty) {
+                    //snapshot.forEach((doc) => {
+                        //taskCollection.push(doc.data())
+                    //});
 
-                    taskCollection.forEach((project) => {
-                        taskVisualList.push(project.projName)
-                    })
+                    //taskCollection.forEach((project) => {
+                        //taskVisualList.push(project.projName)
+                    //})
 
-                    taskVisualList.forEach((listItem) => {
-                        taskList.value += "• " + listItem + '\n';
-                    })
-                }
+                    //taskVisualList.forEach((listItem) => {
+                        //taskList.value += "• " + listItem + '\n';
+                    //})
+                //}
             } catch (error) {
                 console.log("User data couldn't be loaded!")
                 console.error(error);
