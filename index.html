@@ -345,7 +345,8 @@
                         taskCollection.push(project);
                         taskVisualList.push(project.projName);
                         let normDate = normalizeDate(project.projDueDate, project);
-                        taskList.value += "• " + project.projName + " | " + normDate + " => " + project.projDueTime + "\n";
+                        let normTime = timeNormalizer(project.projDueTime, project);
+                        taskList.value += "• " + project.projName + " | " + normDate + " => " + normTime + "\n";
                     });
                 }
             );

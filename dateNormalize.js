@@ -31,6 +31,21 @@ function normalizeDate(stringDate, project) {
     } else {
         dayEnd = "th";
     }
+    let commaAdd = year === "" ? "" : ", "
+    return month + " " + day + dayEnd + commaAdd + year
+}
 
-    return month + " " + day + dayEnd + ", " + year
+function timeNormalizer(timeString, project) {
+    let hourString = timeString.substring(0,2);
+    let hour;
+    let minuteString = timeString.substring(3,5);
+    let minute;
+    let secondString = timeString.substring(4,7);
+    let second;
+    let hourEnd = "";
+    if (Number(secondString) === 0) second = "";
+    if (Number(hourString) >= 12 && Number(hourString) < 24) hourEnd = "PM";
+    if ((Number(hourString) >= 0 || Number(hourString) === 24) && Number(hourString) < 12) hourEnd = "AM";
+    let ending = second === "" ? hourEnd : ":" + secondString + " " + hourEnd;
+    return hourString + ":" + minuteString + ending;
 }
