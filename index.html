@@ -318,23 +318,23 @@
             }
         }
 
-        onSnapshot(collection(db, "users", uuid, "projects"), (snapshot) => {
-            taskCollection = [];
-            taskVisualList = [];
-            taskList.value = "";
-            
-            snapshot.forEach((doc) => {
-                taskCollection.push(doc.data())
+        function startProjectListener() {
+            onSnapshot(collection(db, "users", uuid, "projects"), (snapshot) => {
+                taskCollection = [];
+                taskVisualList = [];
+                tasks = snapshot.size;
+                taskList.value = "";
+
+                snapshot.forEach((doc) => {
+                    const project = doc.data();
+                    taskCollection.push(project);
+                    taskVisualList.push(project.projName);
+                    taskList.value += "• " + project.projName + "\n";
+                });
             });
+        }
 
-            taskCollection.forEach((project) => {
-                taskVisualList.push(project.projName)
-            })
-
-            taskVisualList.forEach((listItem) => {
-                taskList.value += "• " + listItem + '\n';
-            })
-        })
+        startProjectListener();
 
 
         async function loadUserData() {
