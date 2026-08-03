@@ -52,6 +52,7 @@
         <label for="projDueTimeInp">Select a time due...</label><input id="projDueTimeInp" type="time" step="1">
         <button id="projCreateBtn">Create Task</button>
     </div>
+    <script src="dateNormalize.js"></script>
     <script src="adjnouns.js"></script>
     <script src="bannedwordlist.js"></script>
     <script type="module">
@@ -343,8 +344,8 @@
 
                         taskCollection.push(project);
                         taskVisualList.push(project.projName);
-
-                        taskList.value += "• " + project.projName + " | " + project.projDueDate + " => " + project.projDueTime + "\n";
+                        let normDate = normalizeDate(project.projDueDate, project);
+                        taskList.value += "• " + project.projName + " | " + normDate + " => " + project.projDueTime + "\n";
                     });
                 }
             );
