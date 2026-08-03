@@ -136,6 +136,7 @@
         let uuid = null;
         let usernameCoolSeconds = 0;
         let usernameSetCooldown = false;
+        let projectListenerUnsubscribe = null;
         //Variables for sign up & login
         let usernameInp = null;
         let passwordInp = null;
@@ -248,6 +249,10 @@
                 passwordEl.value = "";
                 mainUserMenu.style.display = "none";
                 loginMenuBack.style.display = "grid";
+                if (projectListenerUnsubscribe) {
+                    projectListenerUnsubscribe();
+                    projectListenerUnsubscribe = null;
+                }
                 signOut(auth)
                 alert("Your internet disconnected! Reconnect and sign back in!")
             } else if (uuid !== null && uuid !== undefined) {
@@ -265,6 +270,7 @@
                 loginMenuBack.style.display = "none";
                 mainUserMenu.style.display = "grid";    
                 loadUserData();
+                startProjectListener();
             } else {
                 console.log("Couldn't login!")
             }
@@ -294,6 +300,7 @@
             }
             userWelcome.innerText = "Hello " + username + "!";
             await setUserBasicsData(0)
+            startProjectListener();
         }
 
         async function signUp() {
@@ -319,22 +326,29 @@
         }
 
         function startProjectListener() {
-            onSnapshot(collection(db, "users", uuid, "projects"), (snapshot) => {
-                taskCollection = [];
-                taskVisualList = [];
-                tasks = snapshot.size;
-                taskList.value = "";
+            if (projectListenerUnsubscribe) {
+                projectListenerUnsubscribe();
+            }
 
-                snapshot.forEach((doc) => {
-                    const project = doc.data();
-                    taskCollection.push(project);
-                    taskVisualList.push(project.projName);
-                    taskList.value += "• " + project.projName + "\n";
-                });
-            });
+            projectListenerUnsubscribe = onSnapshot(
+                collection(db, "users", uuid, "projects"),
+                (snapshot) => {
+                    taskCollection = [];
+                    taskVisualList = [];
+                    tasks = snapshot.size;
+                    taskList.value = "";
+
+                    snapshot.forEach((doc) => {
+                        const project = doc.data();
+
+                        taskCollection.push(project);
+                        taskVisualList.push(project.projName);
+
+                        taskList.value += "• " + project.projName + "\n";
+                    });
+                }
+            );
         }
-
-        startProjectListener();
 
 
         async function loadUserData() {
