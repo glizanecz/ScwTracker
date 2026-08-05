@@ -38,6 +38,10 @@
         <h1 id="userWelcome">Hello!</h1>
         <button id="changeUsername">Change Username...</button>
         <h2>View all your tasks below!</h2>
+        <select title="How we sort your projects..." id="priorityMethodInput">
+            <option>Manually</option>
+            <option>Automatically (By Due Date)</option>
+        </select>
         <textarea readonly placeholder="You currently don't have any tasks, get started by pressing the button..." id="taskList"></textarea>
         <br>
         <button id="addTaskBtn">Add A Task!</button>
@@ -117,6 +121,7 @@
         //Elements for main user menu
         const userWelcome = document.getElementById("userWelcome");
         const changeUsername = document.getElementById("changeUsername");
+        const priorityMethodInput = document.getElementById("priorityMethodInput");
         const taskList = document.getElementById("taskList");
         const addTaskBtn = document.getElementById("addTaskBtn");
         //Elements for add task menu
@@ -134,6 +139,7 @@
         let tasks = 0;
         let taskCollection = [];
         let taskVisualList = [];
+        let priorityList = []
         let uuid = null;
         let usernameCoolSeconds = 0;
         let usernameSetCooldown = false;
@@ -150,6 +156,8 @@
         let projImages = [];
         let projContributors = [];
         let projCreateLock = 0;
+        //Variables for main user menu
+        let priorityMethod = "Automatically (By Due Date)";
 
         projCreateBtn.onclick = async function () {
             if (projCreateLock === 0) {
@@ -482,6 +490,10 @@
         }
 
         usernameCooldownStart()
+
+        priorityMethodInput.addEventListener("change", function(event) {
+            priorityMethod = priorityMethodInput.value;
+        })
     </script>
 </body>
 </html>
