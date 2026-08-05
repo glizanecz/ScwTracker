@@ -12,14 +12,16 @@ function findDateDistance(dueTime, dueDate) {
     let date = Date.parse(dueDate);
     let millisecondTotal = 0;
 
-    if (dueDate.includes("AM")) {
+    if (dueTime.includes("AM")) {
         hour = Number(dueTime.substring(0,2));
-        minute = Number(dueTime.substring(3,6));
-        dueTime.length > 5 ? second = substring(7, 10) : second = 0;
-    } else if (dueDate.includes("PM")){
-        hour = Number(dueTime.substring(0,2)) + 12;
-        minute = Number(dueTime.substring(3,6));
-        dueTime.length > 5 ? second = substring(7, 10) : second = 0;
+        if (hour === 12) hour = 0;
+        minute = Number(dueTime.substring(3,5));
+        dueTime.length > 5 ? second = Number(dueTime.substring(7, 9)) : second = 0;
+    } else if (dueTime.includes("PM")){
+        hour = Number(dueTime.substring(0,2));
+        if (hour !== 12) hour += 12;
+        minute = Number(dueTime.substring(3,5));
+        dueTime.length > 5 ? second = Number(dueTime.substring(7, 9)) : second = 0;
     }
 
     millisecondTotal += hour * (1000 * 60 * 60);
@@ -27,5 +29,5 @@ function findDateDistance(dueTime, dueDate) {
     millisecondTotal += second * 1000;
     millisecondTotal += date;
 
-    return millisecondTotal - new Date.now();
+    return millisecondTotal - Date.now();
 }
