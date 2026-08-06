@@ -3,7 +3,7 @@ function sortAutomatically(projects) {
         return findDateDistance(a.projDueTime, a.projDueDate) -
         findDateDistance(b.projDueTime, b.projDueDate)
     })
-    return tempArray
+    return projects
 }
 
 function findDateDistance(dueTime, dueDate) {

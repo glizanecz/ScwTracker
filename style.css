@@ -60,11 +60,10 @@ textarea {
     min-height: 200px;
     min-width: fit-content;
     box-sizing: border-box; 
-    display: block;
+    display: flex;
     background-color: grey; 
-    color: black;
+    font: black;
     resize: none;
     overflow: auto;
     overflow-wrap: break-word;
-    white-space: pre-wrap;
 }
