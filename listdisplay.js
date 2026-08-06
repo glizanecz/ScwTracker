@@ -37,7 +37,7 @@ function displayList(taskCol, sortMethod) {
     if (sortMethod === "Automatically (By Due Date)") {
         let allTasks = sortAutomatically(taskCol);
         for (let i = 0; i < allTasks.length; i++) {
-            taskList.value += "• " + allTasks[i].projName + normalizeDate(allTasks[i].projDueDate) + " => " + timeNormalizer(allTasks[i].projDueTime) + "\n";
+            taskList.value += "• " + allTasks[i].projName + " " + normalizeDate(allTasks[i].projDueDate) + " => " + timeNormalizer(allTasks[i].projDueTime) + '\n';
         }
     }
 }
