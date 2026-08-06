@@ -2,7 +2,7 @@ function normalizeDate(stringDate, project) {
     let year;
     let month = "";
     let monthString = stringDate.substring(5,7)
-    let day = Number(stringDate.substring(8,10));
+    let day = Number(stringDate.substring(8,10)); //update me bro
     let dayEnd = "";
     if (new Date().getFullYear() === Number(stringDate.substring(0,4))) {
         year = ""
