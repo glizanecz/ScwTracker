@@ -1,9 +1,10 @@
 function sortAutomatically(projects) {
-    projects.sort((a,b) => {
+    let tempArray = structuredClone(projects)
+    tempArray.sort((a,b) => {
         return findDateDistance(a.projDueTime, a.projDueDate) -
         findDateDistance(b.projDueTime, b.projDueDate)
     })
-    return projects //WORK PLEASE BRO
+    return tempArray //WORK PLEASE BRO
 }
 
 function findDateDistance(dueTime, dueDate) {
