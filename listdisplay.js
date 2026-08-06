@@ -43,3 +43,8 @@ function displayList(taskCol, sortMethod) {
         }
     }
 }
+
+function normalizeMilliseconds(milli) {
+    daysLeft = milli / (1000 * 60 * 60 * 24)
+    if (daysLeft >= 1)
+}
