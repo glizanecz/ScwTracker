@@ -358,7 +358,7 @@
                         //let normTime = timeNormalizer(project.projDueTime, project);
                         //taskList.value += "• " + project.projName + " | " + normDate + " => " + normTime + "\n";
                     });
-                    displayList(taskCollection);
+                    displayList(taskCollection, priorityMethod);
                 }
             );
         }
@@ -375,7 +375,7 @@
                 taskCollection.push(project);
                 taskVisualList.push(project.projName);
             });
-            displayList(taskCollection);
+            displayList(taskCollection, priorityMethod);
         }
 
 
