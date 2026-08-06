@@ -2,7 +2,7 @@ function normalizeDate(stringDate, project) {
     let year;
     let month = "";
     let monthString = stringDate.substring(5,7)
-    let day = stringDate.substring(8,10)
+    let day = Number(stringDate.substring(8,10));
     let dayEnd = "";
     if (new Date().getFullYear() === Number(stringDate.substring(0,4))) {
         year = ""
@@ -22,11 +22,11 @@ function normalizeDate(stringDate, project) {
     if (monthString === "11") month = "November";
     if (monthString === "12") month = "December";
 
-    if (day === "01" || day === "21" || day === "31") {
+    if (day === "1" || day === "21" || day === "31") {
         dayEnd = "st";
-    } else if (day === "03" || day === "23") {
+    } else if (day === "3" || day === "23") {
         dayEnd = "rd";
-    } else if (day === "02" || day === "22") {
+    } else if (day === "2" || day === "22") {
         dayEnd = "nd";
     } else {
         dayEnd = "th";
