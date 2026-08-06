@@ -1,8 +1,10 @@
 function sortAutomatically(projects) {
-    let lastItemUrgency = 0;
-    for (let i = 0; i < projects.length; i++) {
-        
-    }
+    let tempArray = [...projects];
+    tempArray.sort((a,b) => {
+        return findDateDistance(a.dueTime, a.dueDate) -
+        findDateDistance(b.dueTime, b.dueDate)
+    })
+    return tempArray
 }
 
 function findDateDistance(dueTime, dueDate) {
@@ -30,4 +32,13 @@ function findDateDistance(dueTime, dueDate) {
     millisecondTotal += date;
 
     return millisecondTotal - Date.now();
+}
+
+function displayList(taskCol, sortMethod) {
+    if (sortMethod === "Automatically (By Due Date)") {
+        let allTasks = sortAutomatically(taskCol);
+        for (let i = 0; i < allTasks.length; i++) {
+            taskList.value += "• " + allTasks[i].projName + normalizeDate(allTasks[i].projDueDate) + " => " + timeNormalizer(allTasks[i].projDueTime);
+        }
+    }
 }

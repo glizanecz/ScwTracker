@@ -164,7 +164,7 @@
             if (projCreateLock === 0) {
                 projCreateLock = 1;
                 projName = projNameInp.value;
-                taskList.value += "• " + projName + '\n';
+                //taskList.value += "• " + projName + '\n';
                 projNameInp.value = "";
                 projDesc = projDescInp.value;
                 projDescInp.value = "";
@@ -185,6 +185,7 @@
                     projContributors: projContributors,
                 })
                 tasks++;
+                await collectDataToDisplay();
                 await setUserBasicsData(0);
                 addTaskMenu.style.display = "none";
                 mainUserMenu.style.display = "grid";
@@ -353,12 +354,28 @@
 
                         taskCollection.push(project);
                         taskVisualList.push(project.projName);
-                        let normDate = normalizeDate(project.projDueDate, project);
-                        let normTime = timeNormalizer(project.projDueTime, project);
-                        taskList.value += "• " + project.projName + " | " + normDate + " => " + normTime + "\n";
+                        //let normDate = normalizeDate(project.projDueDate, project);
+                        //let normTime = timeNormalizer(project.projDueTime, project);
+                        //taskList.value += "• " + project.projName + " | " + normDate + " => " + normTime + "\n";
                     });
+                    displayList(taskCollection);
                 }
             );
+        }
+
+        async function collectDataToDisplay () {
+            const snap = await getDocs(collection(db, "users", uuid, "projects"))
+            taskCollection = [];
+            taskVisualList = [];
+            tasks = snap.size;
+            taskList.value = "";
+            snap.forEach((doc) => {
+                const project = doc.data();
+
+                taskCollection.push(project);
+                taskVisualList.push(project.projName);
+            });
+            displayList(taskCollection);
         }
 
 
@@ -376,20 +393,6 @@
                     userWelcome.innerText = "Hello " + username + "!";
                     tasks = data.tasks;
                 }
-                //const snapshot = await getDocs(collection(db, "users", uuid, "projects"))
-                //if (!snapshot.empty) {
-                    //snapshot.forEach((doc) => {
-                        //taskCollection.push(doc.data())
-                    //});
-
-                    //taskCollection.forEach((project) => {
-                        //taskVisualList.push(project.projName)
-                    //})
-
-                    //taskVisualList.forEach((listItem) => {
-                        //taskList.value += "• " + listItem + '\n';
-                    //})
-                //}
             } catch (error) {
                 console.log("User data couldn't be loaded!")
                 console.error(error);
