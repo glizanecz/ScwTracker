@@ -1,6 +1,8 @@
 function sortAutomatically(projects) {
     let tempArray = [...projects];
     tempArray.sort((a,b) => {
+        console.log(a);
+        console.log(b);
         return findDateDistance(a.projDueTime, a.projDueDate) -
         findDateDistance(b.projDueTime, b.projDueDate)
     })
