@@ -39,7 +39,7 @@ input {
     background-color: rgb(51, 51, 51);
     border-radius: 5px;
     border-color: black;   
-    color: white; 
+    color: rgb(20, 50, 183); 
 }
 
 .sbmt::hover {

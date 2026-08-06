@@ -1,0 +1,141 @@
+body {
+    display: grid;
+    place-items: center;
+    /*background-color: rgb(24, 144, 188);*/
+    background-color: #F8F9FA;
+    min-height: 100dvh;
+    padding: 12px;
+    box-sizing: border-box;
+    margin: 0;
+    font-family:Georgia, 'Times New Roman', Times, serif
+}
+
+.background {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    background-color: #eae9e9;
+    padding: 30px;
+    width: 100%;
+    height: 100%;
+    max-height: calc(100% - 30px);
+    max-width: calc(100% - 30px);
+    box-sizing: border-box;
+    text-align: center;
+    display: grid;
+    place-items: center;
+    align-content: center;
+    border-radius: 12px;
+    row-gap: 28px;
+}
+
+.loginInput {
+    background-color: rgba(29, 52, 148, 0.806);
+    border-radius: 5px;
+    border-color: black;
+    color: white;
+    box-sizing: border-box;
+    max-width: 100%;
+    border: none;
+    padding-left: 10px;
+    padding-top: 0px;
+    font-size: 100%;
+    line-height: 2;
+    text-align: center;
+}
+
+.loggedInput {
+    background-color: rgba(155, 175, 255, 0.806);
+    border-radius: 5px;
+    border-color: black;
+    color: rgb(0, 0, 0);
+    box-sizing: border-box;
+    max-width: 100%;
+    border: none;
+    padding-left: 10px;
+    padding-top: 0px;
+    font-size: 100%;
+    line-height: 2;
+    text-align: center;
+}
+
+.sbmt {
+    border-radius: 12px;
+    padding: 10px;
+    border: none;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    background-color: rgb(183, 197, 235);
+    color: rgb(4, 4, 4); 
+}
+
+.sbmt:hover {
+    border-radius: 12px;
+    padding: 10px;
+    border: none;
+    background-color: rgb(141, 153, 184);
+    color: white;   
+}
+        
+textarea::placeholder {
+    color: black;
+}
+
+textarea {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    width: 100%;
+    height: 100%;
+    max-height: fit-content;
+    max-width: 800px;
+    min-height: 200px;
+    min-width: fit-content;
+    box-sizing: border-box; 
+    display: flex;
+    background-color: rgb(198, 213, 255);
+    font: black;
+    resize: none;
+    overflow: auto;
+    overflow-wrap: break-word;
+    border: none;
+    border-radius: 12px;
+    padding: 20px;
+}
+
+.innerTitleDiv {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    background-color: rgb(198, 213, 255);
+    padding-left: 20px;
+    padding-right: 20px;
+    border-radius: 10px;
+}
+
+.innerDescriptionDiv {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    background-color: rgb(198, 213, 255);
+    padding-left: 20px;
+    padding-right: 20px;
+    border-radius: 10px;
+}
+
+.LogSignBack {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    display: grid;
+    background-color: rgb(198, 213, 255);
+    border-radius: 10px;
+    padding: 15px;
+    row-gap: 2px;
+}
+
+.loggedButtons {
+    border-radius: 12px;
+    border: none;
+    padding: 10px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    background-color: rgb(183, 197, 235);
+    color: rgb(4, 4, 4); 
+}
+
+.loggedButtons:hover {
+    border-radius: 12px;
+    border: none;
+    padding: 10px;
+    background-color: rgb(141, 153, 184);
+    color: white;   
+}

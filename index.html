@@ -3,23 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ScwTracker V1.0.1</title>
+    <title>ScwTracker V1.0.2</title>
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="testing.css">
 </head>
 <body>
     <div id="loginMenuBack" class="background">
-        <h1> Welcome to ScwTracker 1.0.1! </h1>
-        <h3> A Lightweight task tracker for students, employees, and busy parents alike!</h3>
-        <br>
-        <label for="username">Email:</label><input id="username" type="text" minlength="11" maxlength="35">
-        <br>
-        <label for="password">Password:</label><input id="password" type="password" minlength="6" maxlength="20">
-        <br>
-        <button id="loginBtn" class="sbmt">Login...</button> 
-        <br>
-        <button id="signUpBtn" class="sbmt">Or Sign Up...</button>
+        <div class="innerTitleDiv">
+            <h1> Welcome to <em>ScwTracker </em>1.0.1!</h1>
+        </div>
+        <div class="innerDescriptionDiv">
+            <h3> A Lightweight task tracker for students, employees, and busy parents alike!</h3>
+        </div>
+        <div class="LogSignBack">
+            <label for="username">Email:</label>
+            <br>
+            <input class="loginInput" id="username" type="text" minlength="11" maxlength="35">
+            <br>
+            <label for="password">Password:</label>
+            <br>
+            <input class="loginInput"  id="password" type="password" minlength="6" maxlength="20">
+            <br>
+            <button id="loginBtn" class="sbmt">Login...</button> 
+            <br>
+            <button id="signUpBtn" class="sbmt">Or Sign Up...</button>
+        </div>
 
         <h6> ScwTracker | Copyright 2026 ⓒ </h6>
     </div>
@@ -31,12 +40,12 @@
         <br>
         <input id="userNickname" maxlength="12">
         <br>
-        <button id="goToMainBtn">Dive right in!</button>
+        <button class="loggedButtons" id="goToMainBtn">Dive right in!</button>
     </div>
 
     <div id="mainUserMenu" class="background">
         <h1 id="userWelcome">Hello!</h1>
-        <button id="changeUsername">Change Username...</button>
+        <button class="loggedButtons"  id="changeUsername">Change Username...</button>
         <h2>View all your tasks below!</h2>
         <select title="How we sort your projects..." id="priorityMethodInput">
             <option>Automatically (By Due Date)</option>
@@ -44,17 +53,17 @@
         </select>
         <textarea readonly placeholder="You currently don't have any tasks, get started by pressing the button..." id="taskList"></textarea>
         <br>
-        <button id="addTaskBtn">Add A Task!</button>
+        <button class="loggedButtons"  id="addTaskBtn">Add A Task!</button>
     </div>
 
     <div id="addTaskMenu" class="background">
-        <label for="projNameInp">Enter the name of your project...</label><input id="projNameInp" placeholder="Math homework #2"> 
+        <label for="projNameInp">Enter the name of your project...</label><input class="loggedInput" id="projNameInp" placeholder="Math homework #2"> 
         <label for="projDescInp">Enter the description of your project...</label><textarea id="projDescInp" placeholder="This is important!"></textarea>
-        <label for="projColabInp">Add collaborators (collaborators must accept a friend request before joining)</label><input id="projColabInp" placeholder="Jeremy92, Jamie9, etc...">
-        <label for="projImgInp">Insert up to two images...</label><input id="projImgInp" type="file" accept="image/*" multiple>
-        <label for="projDueDateInp">Select a due date...</label><input id="projDueDateInp" type="date">
-        <label for="projDueTimeInp">Select a time due...</label><input id="projDueTimeInp" type="time" step="1">
-        <button id="projCreateBtn">Create Task</button>
+        <label for="projColabInp">Add collaborators (collaborators must accept a friend request before joining)</label><input class="loggedInput"  id="projColabInp" placeholder="Jeremy92, Jamie9, etc...">
+        <label for="projImgInp">Insert up to two images...</label><input class="loggedInput"  id="projImgInp" type="file" accept="image/*" multiple>
+        <label for="projDueDateInp">Select a due date...</label><input class="loggedInput"  id="projDueDateInp" type="date">
+        <label for="projDueTimeInp">Select a time due...</label><input class="loggedInput"  id="projDueTimeInp" type="time" step="1">
+        <button class="loggedButtons" id="projCreateBtn">Create Task</button>
     </div>
     <script src="listdisplay.js"></script>
     <script src="dateNormalize.js"></script>
