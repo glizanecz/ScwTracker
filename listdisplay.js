@@ -1,5 +1,5 @@
 function sortAutomatically(projects) {
-    let tempArray = structuredClone(projects)
+    let tempArray = [...projects];
     tempArray.sort((a,b) => {
         return findDateDistance(a.projDueTime, a.projDueDate) -
         findDateDistance(b.projDueTime, b.projDueDate)
@@ -37,8 +37,9 @@ function findDateDistance(dueTime, dueDate) {
 function displayList(taskCol, sortMethod) {
     if (sortMethod === "Automatically (By Due Date)") {
         let allTasks = sortAutomatically(taskCol);
+        console.log("sorted tasks:", allTasks);
         for (let i = 0; i < allTasks.length; i++) {
-            taskList.textContent += "• " + allTasks[i].projName + " " + normalizeDate(allTasks[i].projDueDate) + " => " + timeNormalizer(allTasks[i].projDueTime) + '\n';
+            taskList.value += "• " + allTasks[i].projName + " " + normalizeDate(allTasks[i].projDueDate) + " => " + timeNormalizer(allTasks[i].projDueTime) + '\n';
         }
     }
 }
