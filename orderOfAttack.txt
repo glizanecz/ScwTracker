@@ -1,4 +1,10 @@
 1. Task editing
+(ps, for this, lets just add an edit menu that expands to have each title
+with its' respective button (each added with innerHTML), then, when the user
+clicks on that task, it will load task details. Also important to say that the 
+edit menu should just have X and ✓ next too tasks aswell. Users won't want to
+click on the edit menu, click on the task, and then click on the delete inside,
+the delete or complete quick buttons will help eliminate extra struggle with this.)
 2. Task deletion
 --MOVED TO DONE--
 3. Add, for example, "Due 3 Days" for each project
