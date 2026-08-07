@@ -58,9 +58,10 @@
 
     <div id="addTaskMenu" class="background">
         <label for="projNameInp">Enter the name of your project...</label><input class="loggedInput" id="projNameInp" placeholder="Math homework #2"> 
-        <label for="projDescInp">Enter the description of your project...</label><textarea id="projDescInp" placeholder="This is important!"></textarea>
+        <label for="projDescInp">Enter the description of your project...</label><textarea id="projDescInp" placeholder="Enter description here..."></textarea>
         <label for="projColabInp">Add collaborators (collaborators must accept a friend request before joining)</label><input class="loggedInput"  id="projColabInp" placeholder="Jeremy92, Jamie9, etc...">
         <label for="projImgInp">Insert up to two images...</label><input class="loggedInput"  id="projImgInp" type="file" accept="image/*" multiple>
+        <label for="projPriorityInp">Priority: </label><input class="loggedInput" type="number" id="projPriorityInp">
         <label for="projDueDateInp">Select a due date...</label><input class="loggedInput"  id="projDueDateInp" type="date">
         <label for="projDueTimeInp">Select a time due...</label><input class="loggedInput"  id="projDueTimeInp" type="time" step="1">
         <button class="loggedButtons" id="projCreateBtn">Create Task</button>
@@ -141,6 +142,7 @@
         const projDescInp = document.getElementById("projDescInp");
         const projColabInp = document.getElementById("projColabInp");
         const projImgInp = document.getElementById("projImgInp");
+        const projPriorityInp = document.getElementById("projPriorityInp");
         const projDueDateInp = document.getElementById("projDueDateInp");
         const projDueTimeInp = document.getElementById("projDueTimeInp");
         const projCreateBtn = document.getElementById("projCreateBtn");
@@ -166,6 +168,7 @@
         let projDueDate = "";
         let projDueTime = "";
         let projImages = [];
+        let projPriority = 0;
         let projContributors = [];
         let projCreateLock = 0;
         //Variables for main user menu
@@ -179,6 +182,8 @@
                 projNameInp.value = "";
                 projDesc = projDescInp.value;
                 projDescInp.value = "";
+                projPriority = projPriorityInp.value;
+                projPriorityInp.value = "";
                 projDueDate = projDueDateInp.value;
                 projDueDateInp.value = "";
                 projDueTime = projDueTimeInp.value;
@@ -186,10 +191,11 @@
                 projContributors = projColabInp.value
                 projContributors = projContributors.replaceAll(" ", "").split(",")
                 projColabInp.value = "";
-                projectID = "proj" + (tasks + 1)
+                projectID = "proj" + (tasks + 1);
                 await setDoc(doc(db, "users", uuid, "projects", projectID), {
                     projName: projName,
                     projDesc: projDesc,
+                    priority: projPriority,
                     projDueDate: projDueDate,
                     projDueTime: projDueTime,
                     projImages: projImages,
@@ -506,8 +512,15 @@
 
         usernameCooldownStart()
 
-        priorityMethodInput.addEventListener("change", function(event) {
-            priorityMethod = priorityMethodInput.value;
+        let priorityMethodLock = 0;
+
+        priorityMethodInput.addEventListener("change", async function(event) {
+            if (priorityMethodLock === 0) {
+                priorityMethodLock = 1;
+                priorityMethod = priorityMethodInput.value;
+                await collectDataToDisplay()
+                priorityMethodLock = 0;
+            }
         })
     </script>
 </body>
