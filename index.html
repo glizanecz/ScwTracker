@@ -521,6 +521,9 @@
             if (priorityMethodLock === 0) {
                 priorityMethodLock = 1;
                 priorityMethod = priorityMethodInput.value;
+                taskCollection = [];
+                taskVisualList = [];
+                taskList.value = "";
                 displayList(projectsTemporary, priorityMethod);
                 priorityMethodLock = 0;
             }
