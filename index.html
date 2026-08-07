@@ -158,6 +158,7 @@
         let usernameCoolSeconds = 0;
         let usernameSetCooldown = false;
         let projectListenerUnsubscribe = null;
+        let projectsTemporary = [];
         //Variables for sign up & login
         let usernameInp = null;
         let passwordInp = null;
@@ -375,6 +376,7 @@
                         //let normTime = timeNormalizer(project.projDueTime, project);
                         //taskList.value += "• " + project.projName + " | " + normDate + " => " + normTime + "\n";
                     });
+                    projectsTemporary = [...taskCollection];
                     displayList(taskCollection, priorityMethod);
                 }
             );
@@ -392,6 +394,7 @@
                 taskCollection.push(project);
                 taskVisualList.push(project.projName);
             });
+            projectsTemporary = [...taskCollection];
             displayList(taskCollection, priorityMethod);
         }
 
@@ -518,7 +521,7 @@
             if (priorityMethodLock === 0) {
                 priorityMethodLock = 1;
                 priorityMethod = priorityMethodInput.value;
-                await collectDataToDisplay()
+                displayList(projectsTemporary, priorityMethod);
                 priorityMethodLock = 0;
             }
         })
