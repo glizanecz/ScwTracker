@@ -1,13 +1,15 @@
 1. Task editing
 2. Task deletion
-3. Priority Sort (Manual)
-4. Add, for example, "Due 3 Days" for each project
-5. Friends list
-6. Collabs
-7. QOL Features
-8. Defining specialty of app
+--MOVED TO DONE--
+3. Add, for example, "Due 3 Days" for each project
+4. Friends list
+5. Collabs
+6. QOL Features
+7. Defining specialty of app
+--MOVED TO DONE--
+--MOVED TO DONE--
 
-
-
+DONE:
+3. Priority Sort (DONE)
 8. GUI Makeover (DONE)
 9. Change Name (DONE)
