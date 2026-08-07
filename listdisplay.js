@@ -7,6 +7,14 @@ function sortAutomatically(projects) {
     return tempArray //WORK PLEASE BRO
 }
 
+function sortByPriority(projects) {
+    let tempArray = [...projects];
+    tempArray.sort((a,b) => {
+        return a.priority - b.priority
+    })
+    return tempArray
+}
+
 function findDateDistance(dueTime, dueDate) {
     let hour = 0;
     let minute = 0;
@@ -37,7 +45,13 @@ function findDateDistance(dueTime, dueDate) {
 function displayList(taskCol, sortMethod) {
     if (sortMethod === "Automatically (By Due Date)") {
         let allTasks = sortAutomatically(taskCol);
-        console.log("sorted tasks:", allTasks);
+        console.log("sorted tasks: ", allTasks);
+        for (let i = 0; i < allTasks.length; i++) {
+            taskList.value += "• " + allTasks[i].projName + " " + normalizeDate(allTasks[i].projDueDate) + " => " + timeNormalizer(allTasks[i].projDueTime) + '\n';
+        }
+    } else if (sortMethod === "Manually") {
+        let allTasks = sortByPriority(taskCol);
+        console.log("sorted tasks: ", allTasks);
         for (let i = 0; i < allTasks.length; i++) {
             taskList.value += "• " + allTasks[i].projName + " " + normalizeDate(allTasks[i].projDueDate) + " => " + timeNormalizer(allTasks[i].projDueTime) + '\n';
         }
@@ -47,6 +61,6 @@ function displayList(taskCol, sortMethod) {
 function normalizeMilliseconds(milli) {
     daysLeft = milli / (1000 * 60 * 60 * 24)
     if (daysLeft >= 1) {
-        
+
     }
 }
