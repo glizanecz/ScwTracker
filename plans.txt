@@ -1,0 +1,4 @@
+i think im going to remove the edit tasks menu because it drives the user
+away from the main menu. i could just make a giant div that holds a bunch of
+buttons like Project Name, View, Edit. Yeah, it'll taek a lot of time to do,
+but it will be a better user experience.
