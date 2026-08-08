@@ -51,7 +51,7 @@
         <select title="How we sort your projects..." id="priorityMethodInput">
             <option>Automatically (By Due Date)</option>
             <option>Manually</option>
-        </select>
+        </select> <button id="editProjectBtn" class="loggedButtons">Edit Projects...</button>
         <textarea readonly placeholder="You currently don't have any tasks, get started by pressing the button..." id="taskList"></textarea>
         <br>
         <button class="loggedButtons"  id="addTaskBtn">Add A Task!</button>
@@ -67,12 +67,32 @@
         <label for="projDueTimeInp">Select a time due...</label><input class="loggedInput"  id="projDueTimeInp" type="time" step="1">
         <button class="loggedButtons" id="projCreateBtn">Create Task</button>
     </div>
+    <div id="editProjectsMenu" class="background">
+        <h1>Click any task below to edit!</h1>
+        <button class="loggedButtons" id="returnToMainMenu">Return to main menu...</button>
+        <br>
+        <div id="taskEditList">
+
+        </div>
+    </div>
+
+    <div id="editOneTask" class="background">
+        <label for="editNameInp">Edit the name of the project...</label><input class="loggedInput" id="editNameInp" placeholder="Math homework #2"> 
+        <label for="editDescInp">Edit the description of your project...</label><textarea id="editDescInp" placeholder="Enter description here..."></textarea>
+        <label for="editColabInp">Edit collaborators (collaborators must accept a friend request before joining)</label><input class="loggedInput"  id="editColabInp" placeholder="Jeremy92, Jamie9, etc...">
+        <label for="editImgInp">Edit up to two images...</label><input class="loggedInput"  id="editImgInp" type="file" accept="image/*" multiple>
+        <label for="editPriorityInp">Edit priority: </label><input class="loggedInput" type="number" id="editPriorityInp">
+        <label for="editDueDateInp">Edit the due date...</label><input class="loggedInput"  id="editDueDateInp" type="date">
+        <label for="editDueTimeInp">Edit the time due...</label><input class="loggedInput"  id="editDueTimeInp" type="time" step="1">
+        <button class="loggedButtons" id="editSubmitBtn">Submit Task Edits</button>
+    </div>
+
     <script src="listdisplay.js"></script>
     <script src="dateNormalize.js"></script>
     <script src="adjnouns.js"></script>
     <script src="bannedwordlist.js"></script>
     <script type="module">
-        //yo i am trying to commit these changes but for some reason they arent going through...
+        //yo i am trying to commit these changes but for some reason they arent going through... ok.
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-analytics.js";
 
@@ -136,6 +156,7 @@
         const userWelcome = document.getElementById("userWelcome");
         const changeUsername = document.getElementById("changeUsername");
         const priorityMethodInput = document.getElementById("priorityMethodInput");
+        const editProjectBtn = document.getElementById("editProjectBtn");
         const taskList = document.getElementById("taskList");
         const addTaskBtn = document.getElementById("addTaskBtn");
         //Elements for add task menu
@@ -147,6 +168,22 @@
         const projDueDateInp = document.getElementById("projDueDateInp");
         const projDueTimeInp = document.getElementById("projDueTimeInp");
         const projCreateBtn = document.getElementById("projCreateBtn");
+        //Elements for edit projects menu
+        const editProjectsMenu = document.getElementById("editProjectsMenu");
+        editProjectsMenu.style.display = "none";
+        const returnToMainMenu = document.getElementById("returnToMainMenu");
+        const taskEditList = document.getElementById("taskEditList");
+        //Elements for edit one task menu
+        const editOneTask = document.getElementById("editOneTask");
+        editOneTask.style.display = "none";
+        const editNameInp = document.getElementById("editNameInp");
+        const editDescInp = document.getElementById("editDescInp");
+        const editColabInp = document.getElementById("editColabInp");
+        const editImgInp = document.getElementById("editImgInp");
+        const editPriorityInp = document.getElementById("editPriorityInp");
+        const editDueDateInp = document.getElementById("editDueDateInp");
+        const editDueTimeInp = document.getElementById("editDueTimeInp");
+        const editSubmitBtn = document.getElementById("editSubmitBtn");
 
         //Variables for whole project
         let username = "username01";
@@ -175,6 +212,33 @@
         let projCreateLock = 0;
         //Variables for main user menu
         let priorityMethod = "Automatically (By Due Date)";
+
+        returnToMainMenu.onclick = function() {
+            editProjectsMenu.style.display = "none";
+            mainUserMenu.style.display = "grid";
+        }
+
+        editProjectBtn.onclick = function () {
+            editProjectsMenu.style.display = "grid";
+            mainUserMenu.style.display = "none";
+            displayEditList()
+        }
+        
+        function displayEditList() {
+            let buttonsHTML = "";
+            for (let i = 0; i < projectsTemporary.length; i++) {
+                buttonsHTML += `<button onclick="editIndividual(${projectsTemporary[i].projName})" class="loggedButtons">${projectsTemporary[i].projName}</button>`
+                buttonsHTML += "<br>"
+            }    
+            taskEditList.innerHTML = buttonsHTML;
+        }
+
+        function editIndividual(projectName) {
+            editOneTask.style.display = "grid";
+            editProjectsMenu.style.display = "none";
+        }
+
+        window.editIndividual = editIndividual;
 
         projCreateBtn.onclick = async function () {
             if (projCreateLock === 0) {
@@ -378,6 +442,7 @@
                         //taskList.value += "• " + project.projName + " | " + normDate + " => " + normTime + "\n";
                     });
                     projectsTemporary = [...taskCollection];
+                    displayEditList();
                     displayList(taskCollection, priorityMethod);
                 }
             );
