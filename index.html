@@ -52,7 +52,9 @@
             <option>Automatically (By Due Date)</option>
             <option>Manually</option>
         </select> <button id="editProjectBtn" class="loggedButtons">Edit Projects...</button>
-        <textarea readonly placeholder="You currently don't have any tasks, get started by pressing the button..." id="taskList"></textarea>
+        <div id="taskList" class="textarea">
+
+        </div>
         <br>
         <button class="loggedButtons"  id="addTaskBtn">Add A Task!</button>
     </div>
@@ -256,7 +258,7 @@
                     return
                 }
             }
-            
+
             editOneTask.style.display = "none";
         }
         
@@ -282,7 +284,6 @@
             if (projCreateLock === 0) {
                 projCreateLock = 1;
                 projName = projNameInp.value;
-                //taskList.value += "• " + projName + '\n';
                 projNameInp.value = "";
                 projDesc = projDescInp.value;
                 projDescInp.value = "";
@@ -468,16 +469,13 @@
                     taskCollection = [];
                     taskVisualList = [];
                     tasks = snapshot.size;
-                    taskList.value = "";
+                    taskList.innerHTML = "";
 
                     snapshot.forEach((doc) => {
                         const project = doc.data();
 
                         taskCollection.push(project);
                         taskVisualList.push(project.projName);
-                        //let normDate = normalizeDate(project.projDueDate, project);
-                        //let normTime = timeNormalizer(project.projDueTime, project);
-                        //taskList.value += "• " + project.projName + " | " + normDate + " => " + normTime + "\n";
                     });
                     projectsTemporary = [...taskCollection];
                     displayEditList();
@@ -491,7 +489,7 @@
             taskCollection = [];
             taskVisualList = [];
             tasks = snap.size;
-            taskList.value = "";
+            taskList.innerHTML = "";
             snap.forEach((doc) => {
                 const project = doc.data();
 
@@ -506,7 +504,7 @@
         async function loadUserData() {
             taskCollection = [];
             taskVisualList = [];
-            taskList.value = "";
+            taskList.innerHTML = "";
             try {
                 userEmail = usernameInp;
                 const snap = await getDoc(doc(db, "users", uuid, "userData", "basics"));
@@ -627,7 +625,7 @@
                 priorityMethod = priorityMethodInput.value;
                 taskCollection = [];
                 taskVisualList = [];
-                taskList.value = "";
+                taskList.innerHTML = "";
                 displayList(projectsTemporary, priorityMethod);
                 priorityMethodLock = 0;
             }

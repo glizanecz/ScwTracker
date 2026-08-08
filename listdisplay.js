@@ -47,13 +47,13 @@ function displayList(taskCol, sortMethod) {
         let allTasks = sortAutomatically(taskCol);
         console.log("sorted tasks: ", allTasks);
         for (let i = 0; i < allTasks.length; i++) {
-            taskList.value += "• " + allTasks[i].projName + " " + normalizeDate(allTasks[i].projDueDate) + " => " + timeNormalizer(allTasks[i].projDueTime) + '\n';
+            taskList.innerHTML += "<h4>• " + allTasks[i].projName + " " + normalizeDate(allTasks[i].projDueDate) + " => " + timeNormalizer(allTasks[i].projDueTime) + "</h4> <br>";
         }
     } else if (sortMethod === "Manually") {
         let allTasks = sortByPriority(taskCol);
         console.log("sorted tasks: ", allTasks);
         for (let i = 0; i < allTasks.length; i++) {
-            taskList.value += "• " + allTasks[i].projName + " " + normalizeDate(allTasks[i].projDueDate) + " => " + timeNormalizer(allTasks[i].projDueTime) + '\n';
+            taskList.innerHTML += "<h4>• " + allTasks[i].projName + " " + normalizeDate(allTasks[i].projDueDate) + " => " + timeNormalizer(allTasks[i].projDueTime) + "</h4> <br>";
         }
     }
 }
