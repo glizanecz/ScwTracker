@@ -212,6 +212,8 @@
         let projCreateLock = 0;
         //Variables for main user menu
         let priorityMethod = "Automatically (By Due Date)";
+        //Variables for editing tasks
+        let projectEditFocus = "";
 
         returnToMainMenu.onclick = function() {
             editProjectsMenu.style.display = "none";
@@ -221,19 +223,54 @@
         editProjectBtn.onclick = function () {
             editProjectsMenu.style.display = "grid";
             mainUserMenu.style.display = "none";
-            displayEditList()
+            displayEditList();
+        }
+
+        editSubmitBtn.onclick = function() {
+            let editObject = {
+                projName,
+                projDueDate,
+                projDueTime,
+                projImages,
+                projDesc,
+                projContributors,
+                priority,
+            }
+            editObject.projName = editNameInp.value;
+            editNameInp.value = "";
+            editObject.projDueDate = editDueDateInp.value;
+            editDueDateInp.value = "";
+            editObject.projDueTime = editDueTimeInp.value;
+            editDueTimeInp.value = "";
+            editObject.projImages = editImgInp.value;
+            editImgInp.value = "";
+            editObject.projDesc = editDescInp.value;
+            editDescInp.value = "";
+            editObject.projContributors = editColabInp.value;
+            editColabInp.value = [];
+            editObject.priority = editPriorityInp.value;
+            editPriorityInp.value = 0;
+            for (let i = 0; i < taskCollection.length; i++) {
+                if (taskCollection[i].projName === projectEditFocus) {
+                    taskCollection[i] = editObject;
+                    return
+                }
+            }
+
+            editOneTask.style.display = "none";
         }
         
         function displayEditList() {
             let buttonsHTML = "";
             for (let i = 0; i < projectsTemporary.length; i++) {
-                buttonsHTML += `<button onclick="editIndividual(${projectsTemporary[i].projName})" class="loggedButtons">${projectsTemporary[i].projName}</button>`
+                buttonsHTML += `<button onclick="editIndividual('${projectsTemporary[i].projName.replace(/'/g, "\\'")}')" class="loggedButtons">${projectsTemporary[i].projName}</button>`;
                 buttonsHTML += "<br>"
             }    
             taskEditList.innerHTML = buttonsHTML;
         }
 
         function editIndividual(projectName) {
+            projectEditFocus = projectName;
             editOneTask.style.display = "grid";
             editProjectsMenu.style.display = "none";
         }
