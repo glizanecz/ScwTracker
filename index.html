@@ -261,8 +261,9 @@
             editOneTask.style.display = "none";
         }
 
-        window.viewProject = function viewProject(projectNumber) {
-            projectsTemporary[projectNumber]
+        window.viewProject = function(projectNumber) {
+            const root = currentTasks[projectNumber];
+            console.log(normalizeDate(root.projDueDate, root))
         }
         
         function displayEditList() {
@@ -280,7 +281,15 @@
             editProjectsMenu.style.display = "none";
         }
 
-        window.editIndividual = editIndividual;
+        window.editIndividual = function(projectNum) {
+            const root = currentTasks[projectNum];
+            projectEditFocus = projectNum;
+            editOneTask.style.display = "grid";
+            editProjectsMenu.style.display = "none";
+            console.log(projectNum)
+            console.log(root.projName);
+
+        }
 
         projCreateBtn.onclick = async function () {
             if (projCreateLock === 0) {
