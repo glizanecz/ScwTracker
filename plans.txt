@@ -1,4 +1,13 @@
-i think im going to remove the edit tasks menu because it drives the user
-away from the main menu. i could just make a giant div that holds a bunch of
-buttons like Project Name, View, Edit. Yeah, it'll taek a lot of time to do,
-but it will be a better user experience.
+for the task id problem of deleted tasks screwing up task order, here are some solutions:
+
+1. ditch manual naming in general and switch to firebases addDoc
+2. count how many times the user has deleted documents and make a variable (idk what this would do nvm)
+3. instead of actually deleting projects, just make all the information in the project like status: deleted,
+while deleting all the other information inside of it. only downside to this is that firebase will keep
+reading invisible info, costing me more if this was large scale
+4. create a variable storing how many projects have EVER existed, when a user creates a document, it
+checks if the document project id is less than the amount of projects ever existing, and then telling it to
+go above that number.
+5. kinda like four but instead of a variable, just a list of available project ids that are less than
+the amount of projects ever created. this way, if proj2, proj7, and proj19 exist, it wont create a proj20
+instead it'll create a proj1,proj3-7,proj8-18 and wont have problems.

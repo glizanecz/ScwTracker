@@ -1,4 +1,5 @@
 function normalizeDate(stringDate, project) {
+    if (stringDate === null) return ""
     let year;
     let month = "";
     let monthString = stringDate.substring(5,7)

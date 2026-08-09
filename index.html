@@ -51,7 +51,7 @@
         <select title="How we sort your projects..." id="priorityMethodInput">
             <option>Automatically (By Due Date)</option>
             <option>Manually</option>
-        </select> <button id="editProjectBtn" class="loggedButtons">Edit Projects...</button>
+        </select>
         <div id="taskList" class="taskArea">
 
         </div>
@@ -69,14 +69,6 @@
         <label for="projDueTimeInp">Select a time due...</label><input class="loggedInput"  id="projDueTimeInp" type="time" step="1">
         <button class="loggedButtons" id="projCreateBtn">Create Task</button>
     </div>
-    <div id="editProjectsMenu" class="background">
-        <h1>Click any task below to edit!</h1>
-        <button class="loggedButtons" id="returnToMainMenu">Return to main menu...</button>
-        <br>
-        <div id="taskEditList">
-
-        </div>
-    </div>
 
     <div id="editOneTask" class="background">
         <label for="editNameInp">Edit the name of the project...</label><input class="loggedInput" id="editNameInp" placeholder="Math homework #2"> 
@@ -86,7 +78,18 @@
         <label for="editPriorityInp">Edit priority: </label><input class="loggedInput" type="number" id="editPriorityInp">
         <label for="editDueDateInp">Edit the due date...</label><input class="loggedInput"  id="editDueDateInp" type="date">
         <label for="editDueTimeInp">Edit the time due...</label><input class="loggedInput"  id="editDueTimeInp" type="time" step="1">
-        <button class="loggedButtons" id="editSubmitBtn">Submit Task Edits</button>
+        <button class="loggedButtons" id="cancelEditsBtn">Cancel</button><button class="loggedButtons" id="editSubmitBtn">Submit Task Edits</button>
+    </div>
+
+    <div id="viewOneTask" class="background">
+        <label for="viewName">Name:</label><h2 id="viewName"></h2>
+        <label for="viewDesc">Description:</label><p id="viewDesc"></p>
+        <label for="viewColabs">Collaborators:</label><h3 id="viewColabs"></h3>
+        <label for="viewImages">Images:</label><img id="viewImages1"></img><img id="viewImages2"></img>
+        <label for="viewPriority">Priority:</label><h3 id="viewPriority"></h3>
+        <label for="viewDueDate"></label><input id="viewDueDate" type="date" readonly>
+        <label for="viewDueTime"></label><input id="viewDueTime" type="time" readonly>
+        <button class="loggedButtons" id="viewingDone">I'm Done Viewing...</button>
     </div>
 
     <script src="adjnouns.js"></script>
@@ -157,7 +160,6 @@
         const userWelcome = document.getElementById("userWelcome");
         const changeUsername = document.getElementById("changeUsername");
         const priorityMethodInput = document.getElementById("priorityMethodInput");
-        const editProjectBtn = document.getElementById("editProjectBtn");
         const taskList = document.getElementById("taskList");
         const addTaskBtn = document.getElementById("addTaskBtn");
         //Elements for add task menu
@@ -170,10 +172,6 @@
         const projDueTimeInp = document.getElementById("projDueTimeInp");
         const projCreateBtn = document.getElementById("projCreateBtn");
         //Elements for edit projects menu
-        const editProjectsMenu = document.getElementById("editProjectsMenu");
-        editProjectsMenu.style.display = "none";
-        const returnToMainMenu = document.getElementById("returnToMainMenu");
-        const taskEditList = document.getElementById("taskEditList");
         //Elements for edit one task menu
         const editOneTask = document.getElementById("editOneTask");
         editOneTask.style.display = "none";
@@ -184,7 +182,21 @@
         const editPriorityInp = document.getElementById("editPriorityInp");
         const editDueDateInp = document.getElementById("editDueDateInp");
         const editDueTimeInp = document.getElementById("editDueTimeInp");
+        const cancelEditsBtn = document.getElementById("cancelEditsBtn");
         const editSubmitBtn = document.getElementById("editSubmitBtn");
+        //Elements for view one task menu
+        const viewOneTask = document.getElementById("viewOneTask");
+        viewOneTask.style.display = "none";
+        const viewName = document.getElementById("viewName");
+        const viewDesc = document.getElementById("viewDesc");
+        const viewColabs = document.getElementById("viewColabs");
+        const viewImages1 = document.getElementById("viewImages1");
+        const viewImages2 = document.getElementById("viewImages2");
+        const viewPriority = document.getElementById("viewPriority");
+        const viewDueDate = document.getElementById("viewDueDate");
+        const viewDueTime = document.getElementById("viewDueTime");
+        const viewingDone = document.getElementById("viewingDone");
+
 
         //Variables for whole project
         let username = "username01";
@@ -216,79 +228,85 @@
         //Variables for editing tasks
         let projectEditFocus = "";
 
-        returnToMainMenu.onclick = function() {
-            editProjectsMenu.style.display = "none";
+        cancelEditsBtn.onclick = function () {
+            editNameInp.value = "";
+            editDueDateInp.value = "";
+            editDueTimeInp.value = "";
+            editImgInp.value = "";
+            editDescInp.value = "";
+            editColabInp.value = "";
+            editPriorityInp.value = 0;
+            editOneTask.style.display = "none";
             mainUserMenu.style.display = "grid";
         }
 
-        editProjectBtn.onclick = function () {
-            editProjectsMenu.style.display = "grid";
-            mainUserMenu.style.display = "none";
-            displayEditList();
-        }
-
-        editSubmitBtn.onclick = function() {
+        editSubmitBtn.onclick = async function() {
             let editObject = {
-                projName,
-                projDueDate,
-                projDueTime,
-                projImages,
-                projDesc,
-                projContributors,
-                priority,
+                projName: editNameInp.value,
+                projDueDate: editDueDateInp.value,
+                projDueTime: editDueTimeInp.value,
+                projImages: "",
+                projDesc: editDescInp.value,
+                projContributors: editColabInp.value.replaceAll(" ", "").split(","),
+                priority: editPriorityInp.value,
             }
-            editObject.projName = editNameInp.value;
             editNameInp.value = "";
-            editObject.projDueDate = editDueDateInp.value;
             editDueDateInp.value = "";
-            editObject.projDueTime = editDueTimeInp.value;
             editDueTimeInp.value = "";
-            editObject.projImages = editImgInp.value;
             editImgInp.value = "";
-            editObject.projDesc = editDescInp.value;
             editDescInp.value = "";
-            editObject.projContributors = editColabInp.value;
-            editColabInp.value = [];
-            editObject.priority = editPriorityInp.value;
+            editColabInp.value = "";
             editPriorityInp.value = 0;
-            for (let i = 0; i < taskCollection.length; i++) {
-                if (taskCollection[i].projName === projectEditFocus) {
-                    taskCollection[i] = editObject;
-                    return
-                }
-            }
-
+            console.log("task: " +  currentEditingTask)
+            console.log("task edited id: " + currentEditingTask.id)
+            console.log("DB: " + db)
+            const docRef = doc(db, "users", uuid, "projects", currentEditingTask.id);
+            await setDoc(docRef, editObject, { merge: true })
+            await collectDataToDisplay();
+            mainUserMenu.style.display = "grid";
             editOneTask.style.display = "none";
         }
 
         window.viewProject = function(projectNumber) {
+            mainUserMenu.style.display = "none";
+            viewOneTask.style.display = "grid";
             const root = currentTasks[projectNumber];
-            console.log(normalizeDate(root.projDueDate, root))
-        }
-        
-        function displayEditList() {
-            let buttonsHTML = "";
-            for (let i = 0; i < projectsTemporary.length; i++) {
-                buttonsHTML += `<button onclick="editIndividual('${projectsTemporary[i].projName.replace(/'/g, "\\'")}')" class="loggedButtons">${projectsTemporary[i].projName}</button>`;
-                buttonsHTML += "<br>"
-            }    
-            taskEditList.innerHTML = buttonsHTML;
+            viewName.textContent = root.projName;
+            viewDesc.textContent = root.projDesc === "" ? "This project has no description..." : root.projDesc;
+            viewColabs.textContent = root.projContributors === "" ? "This project has no Contributors..." : root.projContributors;
+            viewImages1.src = root.projImages1 || root.projImages?.[0] || "";
+            viewImages2.src = root.projImages2 || root.projImages?.[1] || "";
+            viewPriority.textContent = root.projPriority;
+            viewDueDate.value = root.projDueDate === "" ? "This project has no due date..." : root.projDueDate;
+            viewDueTime.value = root.projDueTime === "" ? "This project has no due time..." : root.projDueTime;
         }
 
-        function editIndividual(projectNum) {
-            projectEditFocus = projectNum;
-            editOneTask.style.display = "grid";
-            editProjectsMenu.style.display = "none";
+        viewingDone.onclick = function() {
+            mainUserMenu.style.display = "grid";
+            viewOneTask.style.display = "none";
+            viewName.textContent = "";
+            viewDesc.textContent = "";
+            viewColabs.textContent = "";
+            viewImages1.src = "";
+            viewImages2.src = "";
+            viewPriority.textContent = "";
+            viewDueDate.value = "";
+            viewDueTime.value = "";  
         }
 
         window.editIndividual = function(projectNum) {
             const root = currentTasks[projectNum];
             projectEditFocus = projectNum;
+            window.currentEditingTask = root;
             editOneTask.style.display = "grid";
-            editProjectsMenu.style.display = "none";
-            console.log(projectNum)
-            console.log(root.projName);
-
+            mainUserMenu.style.display = "none";
+            editNameInp.value = root.projName;
+            editDueDateInp.value = root.projDueDate;
+            editDueTimeInp.value = root.projDueTime;
+            editImgInp.value = "";
+            editDescInp.value = root.projDesc;
+            editColabInp.value = root.projContributors;
+            editPriorityInp.value = root.priority;
         }
 
         projCreateBtn.onclick = async function () {
@@ -316,6 +334,7 @@
                     projDueTime: projDueTime,
                     projImages: projImages,
                     projContributors: projContributors,
+                    id: projectID,
                 })
                 tasks++;
                 await collectDataToDisplay();
@@ -489,7 +508,6 @@
                         taskVisualList.push(project.projName);
                     });
                     projectsTemporary = [...taskCollection];
-                    displayEditList();
                     displayList(taskCollection, priorityMethod);
                 }
             );
