@@ -52,7 +52,7 @@
             <option>Automatically (By Due Date)</option>
             <option>Manually</option>
         </select> <button id="editProjectBtn" class="loggedButtons">Edit Projects...</button>
-        <div id="taskList" class="textarea">
+        <div id="taskList" class="taskArea">
 
         </div>
         <br>
@@ -89,12 +89,11 @@
         <button class="loggedButtons" id="editSubmitBtn">Submit Task Edits</button>
     </div>
 
-    <script src="listdisplay.js"></script>
-    <script src="dateNormalize.js"></script>
     <script src="adjnouns.js"></script>
     <script src="bannedwordlist.js"></script>
+    <script src="dateNormalize.js"></script>
+    <script src="listdisplay.js"></script>
     <script type="module">
-        //yo i am trying to commit these changes but for some reason they arent going through... ok.
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-analytics.js";
 
@@ -261,6 +260,10 @@
 
             editOneTask.style.display = "none";
         }
+
+        window.viewProject = function viewProject(projectNumber) {
+            projectsTemporary[projectNumber]
+        }
         
         function displayEditList() {
             let buttonsHTML = "";
@@ -271,10 +274,9 @@
             taskEditList.innerHTML = buttonsHTML;
         }
 
-        function editIndividual(projectName) {
-            projectEditFocus = projectName;
+        function editIndividual(projectNum) {
+            projectEditFocus = projectNum;
             editOneTask.style.display = "grid";
-            editNameInp.value = 
             editProjectsMenu.style.display = "none";
         }
 

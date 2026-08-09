@@ -47,13 +47,13 @@ function displayList(taskCol, sortMethod) {
         let allTasks = sortAutomatically(taskCol);
         console.log("sorted tasks: ", allTasks);
         for (let i = 0; i < allTasks.length; i++) {
-            taskList.innerHTML += "<h6>• " + allTasks[i].projName + " " + normalizeDate(allTasks[i].projDueDate) + " => " + timeNormalizer(allTasks[i].projDueTime) + "</h6> <br>";
+            taskList.innerHTML += "<div class='taskListItem'> <h4>• " + allTasks[i].projName + " " + normalizeDate(allTasks[i].projDueDate) + " => " + timeNormalizer(allTasks[i].projDueTime) + "</h4>" + "<button class='loggedButtons' onclick=" + viewProject(i) + "> View </button>" + "<button class='loggedButtons' onclick=" + viewProject(i) + "> Edit </button>" + "<button class='loggedButtons' onclick=" + viewProject(i) + "> ❎ </button>" + "<button class='loggedButtons' onclick=" + viewProject(i) + "> ✅ </button> </div>";
         }
     } else if (sortMethod === "Manually") {
         let allTasks = sortByPriority(taskCol);
         console.log("sorted tasks: ", allTasks);
         for (let i = 0; i < allTasks.length; i++) {
-            taskList.innerHTML += "<h6>• " + allTasks[i].projName + " " + normalizeDate(allTasks[i].projDueDate) + " => " + timeNormalizer(allTasks[i].projDueTime) + "</h6> <br>";
+            taskList.innerHTML += "<div class='taskListItem'> <h4>• " + allTasks[i].projName + " " + normalizeDate(allTasks[i].projDueDate) + " => " + timeNormalizer(allTasks[i].projDueTime) + "</h4>" + "<button class='loggedButtons' onclick=" + viewProject(i) + "> View </button>" + "<button class='loggedButtons' onclick=" + viewProject(i) + "> Edit </button>" + "<button class='loggedButtons' onclick=" + viewProject(i) + "> ❎ </button>" + "<button class='loggedButtons' onclick=" + viewProject(i) + "> ✅ </button> </div>";
         }
     }
 }
