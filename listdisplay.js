@@ -48,13 +48,17 @@ function displayList(taskCol, sortMethod) {
     window.currentTasks = allTasks;
     console.log("sorted tasks: ", allTasks);
     for (let i = 0; i < allTasks.length; i++) {
-        taskList.innerHTML += "<div class='taskListItem'> <h4>• " + allTasks[i].projName + " " + normalizeDate(allTasks[i].projDueDate) + " => " + timeNormalizer(allTasks[i].projDueTime) + "</h4>" + `<button class='loggedButtons' onclick='viewProject(${i})'> View </button> <button class='loggedButtons' onclick='editIndividual(${i})'> Edit </button> <button class='loggedButtons' onclick='viewProject(${i})'> ❎ </button> <button class='loggedButtons' onclick='viewProject(${i})'> ✅ </button> </div>`;
+        taskList.innerHTML += "<div class='taskListItem'> <h4>• " + allTasks[i].projName + " " + normalizeDate(allTasks[i].projDueDate) + " => " + timeNormalizer(allTasks[i].projDueTime) + "</h4>" + normalizeMilliseconds(findDateDistance(allTasks[i].projDueTime, allTasks[i].projDueDate)) + `<button class='loggedButtons' onclick='viewProject(${i})'> View </button> <button class='loggedButtons' onclick='editIndividual(${i})'> Edit </button> <button class='loggedButtons' onclick='deleteProject(${i})'> ❎ </button> <button class='loggedButtons' onclick='completeProject(${i})'> ✅ </button> </div>`;
     }
 }
 
 function normalizeMilliseconds(milli) {
-    daysLeft = milli / (1000 * 60 * 60 * 24)
+    daysLeft = milli / (1000 * 60 * 60 * 24);
     if (daysLeft >= 1) {
-
+        return "(Due in " + Math.floor(daysLeft) + " days...)"
+    } else if (daysLeft < 1 && daysLeft > 0) {
+        return "(DUE TODAY!)"
+    } else if (daysLeft <= 0) {
+        return ("Task Overdue!")
     }
 }

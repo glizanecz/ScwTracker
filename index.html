@@ -11,7 +11,7 @@
 <body>
     <div id="loginMenuBack" class="background">
         <div class="innerTitleDiv">
-            <h1> Welcome to <em>LifeWiz Beta </em>1.0.4!</h1>
+            <h1> Welcome to <em>LifeWiz Beta </em>1.1!</h1>
         </div>
         <div class="innerDescriptionDiv">
             <h3> A lightweight task tracker for students, employees, and busy parents alike!</h3>
@@ -225,7 +225,10 @@
         //Variables for editing tasks
         let projectEditFocus = "";
 
-        async function deleteProject(projDelID) {
+        window.deleteProject = async function (projectNumber) { 
+            const root = currentTasks[projectNumber];
+            const projDelID = root.id;
+
             const batch = writeBatch(db);
 
             const taskRefA = doc(db, "users", uuid, "projects", projDelID)
@@ -234,8 +237,35 @@
             const taskRefB = doc(db, "users", uuid, "userData", "projectData");
             batch.update(taskRefB, { unusedProjects: arrayUnion(projDelID) })
 
+            const taskRefC = doc(db, "users", uuid, "userData", "basics");
+            tasks--
+            batch.update(taskRefC, { tasks: tasks });
+
             await batch.commit();
         }
+
+        window.completeProject = async function (projectNumber) { 
+            const root = currentTasks[projectNumber];
+            const projDelID = root.id;
+
+            const batch = writeBatch(db);
+
+            const taskRefA = doc(db, "users", uuid, "projects", projDelID)
+            batch.delete(taskRefA)
+
+            const taskRefB = doc(db, "users", uuid, "userData", "projectData");
+            batch.update(taskRefB, { unusedProjects: arrayUnion(projDelID) })
+
+            const taskRefC = doc(db, "users", uuid, "userData", "basics");
+            batch.update(taskRefC, { completedTasks: increment(1) });
+
+            const taskRefD = doc(db, "users", uuid, "userData", "basics");
+            tasks--
+            batch.update(taskRefD, { tasks: tasks });
+
+            await batch.commit();
+        }
+
 
 
 
@@ -328,16 +358,16 @@
                 projContributors = projColabInp.value
                 projContributors = projContributors.replaceAll(" ", "").split(",")
                 projColabInp.value = "";
-                getTotalTasks();
+                await getTotalTasks();
                 const batch = writeBatch(db);
-                if (unusedProjects.length > 0) {
+                if (unusedProjects !== undefined && unusedProjects.length > 0) {
                     let usedProjectID = unusedProjects.shift();
                     projectID = usedProjectID;
                     batch.update(doc(db, "users", uuid, "userData", "projectData"), {
                         unusedProjects: arrayRemove(usedProjectID)
                     });  
                 } else {
-                    projectID = "proj" + (totalTasks + 1);
+                    projectID = "proj" + (tasks + 1);
                 }
                 batch.update(doc(db, "users", uuid, "userData", "projectData"), {
                     tasksTotal: increment(1),
@@ -532,9 +562,13 @@
         }
 
         async function getTotalTasks() {
-            const data = await getDoc(doc(db,"users",uuid,"userData","projectData"));
-            totalTasks = data.tasksTotal;
-            unusedProjects = data.unusedProjects;
+            const snapshot = await getDoc(doc(db,"users",uuid,"userData","projectData"));
+            if (snapshot.exists()) {
+                const data = snapshot.data();
+                totalTasks = data.tasksTotal;
+                unusedProjects = data.unusedProjects;
+            }
+
         }
 
         async function collectDataToDisplay () {

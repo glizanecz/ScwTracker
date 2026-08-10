@@ -1,16 +1,17 @@
 --MOVED TO DONE--
-1. Task deletion
 --MOVED TO DONE--
-2. Add, for example, "Due 3 Days" for each project
-3. Friends list
-4. Collabs
-5. QOL Features
-6. Defining specialty of app
+--MOVED TO DONE--
+1. Add, for example, "Due 3 Days" for each project
+2. Friends list
+3. Collabs
+4. QOL Features
+5. Defining specialty of app
 --MOVED TO DONE--
 --MOVED TO DONE--
 
 DONE:
-1. Task editing
-3. Priority Sort (DONE)
-8. GUI Makeover (DONE)
-9. Change Name (DONE)
+Task deletion
+Task editing
+Priority Sort (DONE)
+GUI Makeover (DONE)
+Change Name (DONE)
