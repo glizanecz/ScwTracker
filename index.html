@@ -623,6 +623,7 @@
                         tasks: tasks,
                     })       
                 } else {
+                    await setUserProjectData();
                     console.log("UUID:", uuid);
                     console.log("Saving:", username);
                     userEmail = usernameInp;
@@ -631,9 +632,31 @@
                         userEmail: userEmail,
                         creationDate: serverTimestamp(),
                         tasks: tasks,
-                        projects: []
+                        projects: [],
+                        completedTasks: 0,
                     })
                     console.log("Saved!");
+                }
+            } catch (error) {
+                console.log("Data didn't set!")
+                console.error(error);
+                console.error(error.code);
+                console.error(error.message);
+            }
+        }
+
+        async function setUserProjectData() {
+            try {
+                const snapshot = await getDoc(doc(db, "users", uuid, "userData", "projectData"));
+                if (snapshot.exists()) {
+                    const data = snapshot.data();
+                    unusedProjects = data.unusedProjects;
+                    totalTasks = data.tasksTotal;
+                } else {
+                    await setDoc(doc(db, "users", uuid, "userData", "projectData"), {
+                        unusedProjects: [],
+                        tasksTotal: 0,
+                    })
                 }
             } catch (error) {
                 console.log("Data didn't set!")
