@@ -561,6 +561,22 @@
             );
         }
 
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                uuid = user.uid;
+                loginMenuBack.style.display = "none";
+                await loadUserData();
+                mainUserMenu.style.display = "grid";
+                startProjectListener();
+            } else {
+                uuid = null;
+                loginMenuBack.style.display = "grid";
+                signUpWelcome.style.display = "none";
+                mainUserMenu.style.display = "none";
+                addTaskMenu.style.display = "none";
+            }
+        })
+
         async function getTotalTasks() {
             const snapshot = await getDoc(doc(db,"users",uuid,"userData","projectData"));
             if (snapshot.exists()) {
