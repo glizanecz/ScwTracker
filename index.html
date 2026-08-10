@@ -63,7 +63,6 @@
         <label for="projNameInp">Enter the name of your project...</label><input class="loggedInput" id="projNameInp" placeholder="Math homework #2"> 
         <label for="projDescInp">Enter the description of your project...</label><textarea id="projDescInp" placeholder="Enter description here..."></textarea>
         <label for="projColabInp">Add collaborators (collaborators must accept a friend request before joining)</label><input class="loggedInput"  id="projColabInp" placeholder="Jeremy92, Jamie9, etc...">
-        <label for="projImgInp">Insert up to two images...</label><input class="loggedInput"  id="projImgInp" type="file" accept="image/*" multiple>
         <label for="projPriorityInp">Priority: </label><input class="loggedInput" type="number" id="projPriorityInp">
         <label for="projDueDateInp">Select a due date...</label><input class="loggedInput"  id="projDueDateInp" type="date">
         <label for="projDueTimeInp">Select a time due...</label><input class="loggedInput"  id="projDueTimeInp" type="time" step="1">
@@ -74,7 +73,6 @@
         <label for="editNameInp">Edit the name of the project...</label><input class="loggedInput" id="editNameInp" placeholder="Math homework #2"> 
         <label for="editDescInp">Edit the description of your project...</label><textarea id="editDescInp" placeholder="Enter description here..."></textarea>
         <label for="editColabInp">Edit collaborators (collaborators must accept a friend request before joining)</label><input class="loggedInput"  id="editColabInp" placeholder="Jeremy92, Jamie9, etc...">
-        <label for="editImgInp">Edit up to two images...</label><input class="loggedInput"  id="editImgInp" type="file" accept="image/*" multiple>
         <label for="editPriorityInp">Edit priority: </label><input class="loggedInput" type="number" id="editPriorityInp">
         <label for="editDueDateInp">Edit the due date...</label><input class="loggedInput"  id="editDueDateInp" type="date">
         <label for="editDueTimeInp">Edit the time due...</label><input class="loggedInput"  id="editDueTimeInp" type="time" step="1">
@@ -85,7 +83,6 @@
         <label for="viewName">Name:</label><h2 id="viewName"></h2>
         <label for="viewDesc">Description:</label><p id="viewDesc"></p>
         <label for="viewColabs">Collaborators:</label><h3 id="viewColabs"></h3>
-        <label for="viewImages">Images:</label><img id="viewImages1"></img><img id="viewImages2"></img>
         <label for="viewPriority">Priority:</label><h3 id="viewPriority"></h3>
         <label for="viewDueDate"></label><input id="viewDueDate" type="date" readonly>
         <label for="viewDueTime"></label><input id="viewDueTime" type="time" readonly>
@@ -120,6 +117,9 @@
             collection,
             getDocs,
             onSnapshot,
+            writeBatch,
+            arrayUnion,
+            arrayRemove,
         } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";  
 
         const firebaseConfig = {
@@ -166,7 +166,6 @@
         const projNameInp = document.getElementById("projNameInp");
         const projDescInp = document.getElementById("projDescInp");
         const projColabInp = document.getElementById("projColabInp");
-        const projImgInp = document.getElementById("projImgInp");
         const projPriorityInp = document.getElementById("projPriorityInp");
         const projDueDateInp = document.getElementById("projDueDateInp");
         const projDueTimeInp = document.getElementById("projDueTimeInp");
@@ -178,7 +177,6 @@
         const editNameInp = document.getElementById("editNameInp");
         const editDescInp = document.getElementById("editDescInp");
         const editColabInp = document.getElementById("editColabInp");
-        const editImgInp = document.getElementById("editImgInp");
         const editPriorityInp = document.getElementById("editPriorityInp");
         const editDueDateInp = document.getElementById("editDueDateInp");
         const editDueTimeInp = document.getElementById("editDueTimeInp");
@@ -190,8 +188,6 @@
         const viewName = document.getElementById("viewName");
         const viewDesc = document.getElementById("viewDesc");
         const viewColabs = document.getElementById("viewColabs");
-        const viewImages1 = document.getElementById("viewImages1");
-        const viewImages2 = document.getElementById("viewImages2");
         const viewPriority = document.getElementById("viewPriority");
         const viewDueDate = document.getElementById("viewDueDate");
         const viewDueTime = document.getElementById("viewDueTime");
@@ -202,6 +198,8 @@
         let username = "username01";
         let userEmail = "username01@gmail.com";
         let tasks = 0;
+        let totalTasks = 0;
+        let unusedProjects = [];
         let taskCollection = [];
         let taskVisualList = [];
         let priorityList = []
@@ -219,7 +217,6 @@
         let projDesc = "";
         let projDueDate = "";
         let projDueTime = "";
-        let projImages = [];
         let projPriority = 0;
         let projContributors = [];
         let projCreateLock = 0;
@@ -228,11 +225,24 @@
         //Variables for editing tasks
         let projectEditFocus = "";
 
+        async function deleteProject(projDelID) {
+            const batch = writeBatch(db);
+
+            const taskRefA = doc(db, "users", uuid, "projects", projDelID)
+            batch.delete(taskRefA)
+
+            const taskRefB = doc(db, "users", uuid, "userData", "projectData");
+            batch.update(taskRefB, { unusedProjects: arrayUnion(projDelID) })
+
+            await batch.commit();
+        }
+
+
+
         cancelEditsBtn.onclick = function () {
             editNameInp.value = "";
             editDueDateInp.value = "";
             editDueTimeInp.value = "";
-            editImgInp.value = "";
             editDescInp.value = "";
             editColabInp.value = "";
             editPriorityInp.value = 0;
@@ -245,7 +255,6 @@
                 projName: editNameInp.value,
                 projDueDate: editDueDateInp.value,
                 projDueTime: editDueTimeInp.value,
-                projImages: "",
                 projDesc: editDescInp.value,
                 projContributors: editColabInp.value.replaceAll(" ", "").split(","),
                 priority: editPriorityInp.value,
@@ -253,7 +262,6 @@
             editNameInp.value = "";
             editDueDateInp.value = "";
             editDueTimeInp.value = "";
-            editImgInp.value = "";
             editDescInp.value = "";
             editColabInp.value = "";
             editPriorityInp.value = 0;
@@ -274,8 +282,6 @@
             viewName.textContent = root.projName;
             viewDesc.textContent = root.projDesc === "" ? "This project has no description..." : root.projDesc;
             viewColabs.textContent = root.projContributors === "" ? "This project has no Contributors..." : root.projContributors;
-            viewImages1.src = root.projImages1 || root.projImages?.[0] || "";
-            viewImages2.src = root.projImages2 || root.projImages?.[1] || "";
             viewPriority.textContent = root.projPriority;
             viewDueDate.value = root.projDueDate === "" ? "This project has no due date..." : root.projDueDate;
             viewDueTime.value = root.projDueTime === "" ? "This project has no due time..." : root.projDueTime;
@@ -287,8 +293,6 @@
             viewName.textContent = "";
             viewDesc.textContent = "";
             viewColabs.textContent = "";
-            viewImages1.src = "";
-            viewImages2.src = "";
             viewPriority.textContent = "";
             viewDueDate.value = "";
             viewDueTime.value = "";  
@@ -303,7 +307,6 @@
             editNameInp.value = root.projName;
             editDueDateInp.value = root.projDueDate;
             editDueTimeInp.value = root.projDueTime;
-            editImgInp.value = "";
             editDescInp.value = root.projDesc;
             editColabInp.value = root.projContributors;
             editPriorityInp.value = root.priority;
@@ -325,18 +328,32 @@
                 projContributors = projColabInp.value
                 projContributors = projContributors.replaceAll(" ", "").split(",")
                 projColabInp.value = "";
-                projectID = "proj" + (tasks + 1);
-                await setDoc(doc(db, "users", uuid, "projects", projectID), {
+                getTotalTasks();
+                const batch = writeBatch(db);
+                if (unusedProjects.length > 0) {
+                    let usedProjectID = unusedProjects.shift();
+                    projectID = usedProjectID;
+                    batch.update(doc(db, "users", uuid, "userData", "projectData"), {
+                        unusedProjects: arrayRemove(usedProjectID)
+                    });  
+                } else {
+                    projectID = "proj" + (totalTasks + 1);
+                }
+                batch.update(doc(db, "users", uuid, "userData", "projectData"), {
+                    tasksTotal: increment(1),
+                });
+                batch.set(doc(db, "users", uuid, "projects", projectID), {
                     projName: projName,
                     projDesc: projDesc,
                     priority: projPriority,
                     projDueDate: projDueDate,
                     projDueTime: projDueTime,
-                    projImages: projImages,
                     projContributors: projContributors,
                     id: projectID,
-                })
+                });
                 tasks++;
+                await batch.commit();
+
                 await collectDataToDisplay();
                 await setUserBasicsData(0);
                 addTaskMenu.style.display = "none";
@@ -507,10 +524,17 @@
                         taskCollection.push(project);
                         taskVisualList.push(project.projName);
                     });
+                    getTotalTasks()
                     projectsTemporary = [...taskCollection];
                     displayList(taskCollection, priorityMethod);
                 }
             );
+        }
+
+        async function getTotalTasks() {
+            const data = await getDoc(doc(db,"users",uuid,"userData","projectData"));
+            totalTasks = data.tasksTotal;
+            unusedProjects = data.unusedProjects;
         }
 
         async function collectDataToDisplay () {
