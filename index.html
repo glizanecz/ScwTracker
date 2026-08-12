@@ -44,6 +44,7 @@
     </div>
 
     <div id="mainUserMenu" class="background">
+        <button class="settingsBtn">⚙️</button>
         <h1 id="userWelcome">Hello!</h1>
         <button class="loggedButtons"  id="changeUsername">Change Username...</button>
         <h2>View all your tasks below!</h2>
@@ -565,6 +566,7 @@
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 uuid = user.uid;
+                refreshDisplay();
                 loginMenuBack.style.display = "none";
                 await loadUserData();
                 mainUserMenu.style.display = "grid";
@@ -759,7 +761,11 @@
         })
 
         async function refreshDisplay() {
+            let sleepTimeForRefresh = 10_000;
             while (uuid !== null) {
+                for (let i = 0; i < tasks; i++) {
+                    normalizeprojectsTemporary[i].projDueTime
+                }
                 await sleep(10_000);
                 if (tasks > 0) displayList(projectsTemporary, priorityMethod);
             } 
