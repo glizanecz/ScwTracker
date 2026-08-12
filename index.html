@@ -170,7 +170,6 @@
         const projDueDateInp = document.getElementById("projDueDateInp");
         const projDueTimeInp = document.getElementById("projDueTimeInp");
         const projCreateBtn = document.getElementById("projCreateBtn");
-        //Elements for edit projects menu
         //Elements for edit one task menu
         const editOneTask = document.getElementById("editOneTask");
         editOneTask.style.display = "none";
@@ -510,6 +509,7 @@
             }
             userWelcome.innerText = "Hello " + username + "!";
             await setUserBasicsData(0)
+            refreshDisplay();
             startProjectListener();
         }
 
@@ -528,6 +528,7 @@
             try {
                 const credential = await signInWithEmailAndPassword(auth, usernameInp, passwordInp);
                 uuid = credential.user.uid;
+                refreshDisplay();
                 return "signedin"
             } catch (error) {
                 console.error(error);
@@ -756,6 +757,14 @@
                 priorityMethodLock = 0;
             }
         })
+
+        async function refreshDisplay() {
+            while (uuid !== null) {
+                await sleep(10_000);
+                if (tasks > 0) displayList(projectsTemporary, priorityMethod);
+            } 
+        }
+
     </script>
 </body>
 </html>
