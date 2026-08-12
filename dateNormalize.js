@@ -38,7 +38,7 @@ function normalizeDate(stringDate, project) {
 
 function timeNormalizer(timeString, project) {
     let hourString = timeString.substring(0,2);
-    let hour = Number(hourString)
+    let hour = Number(hourString);
     let minuteString = timeString.substring(3,5);
     let minute;
     let secondString = timeString.substring(6,8);

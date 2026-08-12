@@ -19,7 +19,8 @@ function findDateDistance(dueTime, dueDate) {
     let hour = 0;
     let minute = 0;
     let second = 0;
-    let date = Date.parse(dueDate);
+    let [year, month, day] = dueDate.split("-").map(Number);
+    let date = new Date(year, month - 1, day).getTime();
     let millisecondTotal = 0;
 
     if (dueTime.includes("AM")) {
@@ -44,6 +45,7 @@ function findDateDistance(dueTime, dueDate) {
 
 function displayList(taskCol, sortMethod) {
     let allTasks;
+    taskList.innerHTML = "";
     sortMethod === "Automatically (By Due Date)" ? allTasks = sortAutomatically(taskCol) : allTasks = sortByPriority(taskCol);
     window.currentTasks = allTasks;
     console.log("sorted tasks: ", allTasks);
@@ -53,11 +55,17 @@ function displayList(taskCol, sortMethod) {
 }
 
 function normalizeMilliseconds(milli) {
+    console.log("milliseconds recieved: " + milli);
     daysLeft = milli / (1000 * 60 * 60 * 24);
+    console.log("days left: " + daysLeft);
+    console.log("days left rounded: " + Math.round(daysLeft));
+    hoursLeft = milli / (1000 * 60 * 60);
+    console.log("hours left: " + hoursLeft);
+    console.log("hours left rounded: " + Math.round(hoursLeft));
     if (daysLeft >= 1) {
-        return "(Due in " + Math.floor(daysLeft) + " days...)"
+        return "(Due in " + Math.round(daysLeft) + " days...)";
     } else if (daysLeft < 1 && daysLeft > 0) {
-        return "(DUE TODAY!)"
+        return "(Due in " + Math.round(hoursLeft) + " hours...)";
     } else if (daysLeft <= 0) {
         return ("Task Overdue!")
     }
