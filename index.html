@@ -532,6 +532,7 @@
                     await setUserBasicsData(1);
                     usernameCoolSeconds += 120;
                     alert("Username set to " + username + "!")
+                    return;
                 } 
             } else {
                 username = adjectives[Math.floor(Math.random() * adjectives.length)] + nouns[Math.floor(Math.random() * nouns.length)] + String(Math.floor(Math.random() * 10000));
