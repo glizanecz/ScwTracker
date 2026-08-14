@@ -497,7 +497,9 @@
                     ...doc.data()
                 }));
                 for (const user of uses) {
-                    usernameCollection.push(user.username);
+                    if (user.uuid !== uuid) {
+                        usernameCollection.push(user.username);
+                    }
                 };
             } catch (error) {
                 console.error(error.message)
