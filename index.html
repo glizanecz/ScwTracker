@@ -99,7 +99,11 @@
         </div>
         <h1>Friends Menu</h1>
         <h3>Friend people in order to collaborate with them!</h3>
-        <div id="friendsList">
+        <select id="friendsMenuViewing">
+            <option>View Friends</option>
+            <option>View Requests</option>
+        </select>
+        <div id="friendsList" class="taskArea">
 
         </div>
     </div>
@@ -214,6 +218,7 @@
         const friendsList = document.getElementById("friendsList");
         const settingsMenuFriends = document.getElementById("settingsMenuFriends");
         const mainMenuFriends = document.getElementById("mainMenuFriends");
+        const friendsMenuViewing = document.getElementById("friendsMenuViewing");
         //Elements for settings menu
         const settingsMenuBtn = document.getElementById("settingsMenuBtn");
 
@@ -249,6 +254,10 @@
         let priorityMethod = "Automatically (By Due Date)";
         //Variables for editing tasks
         let projectEditFocus = "";
+        //Variables for friends list
+        let friendRequestsTemporary = [];
+        let outgoingFriendsList = [];
+        let friends = [];
 
         mainMenuFriends.onclick = function() {
             friendsMenu.style.display = "none";
@@ -259,9 +268,37 @@
             friendsMenu.style.display = "none";
         }
 
-        friendsMenuBtn.onclick = function() {
+        friendsMenuBtn.onclick = async function() {
             friendsMenu.style.display = "grid";
             mainUserMenu.style.display = "none";
+            await viewFriends();
+            let friendsMenuViewingOpt = friendsMenuViewing.value;
+            if (friendsMenuViewingOpt === "View Friends") {
+                friendsList.innerHTML = "";
+            } else {
+                friendsList.innerHTML = "";
+                for (const friendRequest of friendRequestsTemporary) {
+                    console.log(friendRequest)
+                    friendsList.innerHTML += `<div class='taskListItem'>
+                                                <h4>Friend Request From ${friendRequest.fromUsername}:</h4>
+                                                <h5>User ID: ${friendRequest.from}</h5>
+                                            </div>`
+                }
+            }
+        }
+
+        friendsMenuViewing.onchange = async function () {
+            await viewFriends();
+            friendsList.innerHTML = "";
+            for (const friendRequest of friendRequestsTemporary) {
+                console.log(friendRequest)
+                friendsList.innerHTML += `<div class='friendsListItem friendsListButton'>
+                                            <h4>Friend Request From ${friendRequest.fromUsername}</h4>
+                                            <button onclick="acceptFriend('${friendRequest.from}')" class="loggedButtons">Accept</button>
+                                            <button onclick="denyFriend('${friendRequest.from}')" class="loggedButtons">Deny</button>
+                                            <button onclick="blockFriend('${friendRequest.from}')" class="loggedButtons">Block</button>
+                                        </div>`
+            }
         }
 
         cancelProjBtn.onclick = function() {
@@ -275,16 +312,65 @@
             mainUserMenu.style.display = "grid";
         }
 
+        window.acceptFriend = async function(senderUUID) {
+            try {
+                const batch = writeBatch(db);
+                batch.update(doc(db,"users",uuid,"friendRequests",senderUUID), {
+                    status: "accepted",
+                })
+                batch.update(doc(db, "uses", uuid), {
+                    friends: arrayUnion(senderUUID)
+                })
+                batch.commit();
+                console.log("Friend Request Accepted...")
+            } catch (error) {
+                console.error(error.message)
+            }
+        }
+
+        window.denyFriend = async function(senderUUID) {
+            try {
+                await updateDoc(doc(db,"users",uuid,"friendRequests",senderUUID), {
+                    status: "denied",
+                })
+            } catch (error) {
+                console.error(error.message)
+            }
+        }
+
+        window.blockFriend = async function(senderUUID) {
+            try {
+                const batch = writeBatch(db)
+
+                batch.update(doc(db,"users",uuid,"friendRequests",senderUUID), { status: "blocked" });
+                batch.update(doc(db, "uses", uuid), { blocked: arrayUnion(senderUUID) })
+
+                await batch.commit();
+            } catch (error) {
+                console.error(error.message)
+            }
+        }
+
         window.viewFriends = async function() {
             const snapshot = await getDocs(collection(db, "users", uuid, "friendRequests"));
             const friendRequestList = snapshot.docs.map(doc => ({
                 ...doc.data()
             }));
-            if (friendRequestList.length === 0) console.log("No friend requests...");
-            for (const friendRequest of friendRequestList) {
-                console.log("Friend Request From " + friendRequest.fromUsername);
-                console.log("-~-~-~-~-~-~");
+            for (const outgoingFriend of outgoingFriendsList) {
+                const snapshot = await getDoc(doc(db, "users", outgoingFriend, "friendRequests", uuid));
+                if (snapshot.exists()) {
+                    const data = snapshot.data();
+                    if (data.status === "accepted") {
+                        const batch = writeBatch(db);
+                        batch.update(doc(db, "users", uuid, "userData", "basics"), {
+                            outgoingFriends: arrayRemove(outgoingFriend)
+                        })
+                        batch.delete(doc(db, "users", outgoingFriend, "friendRequests", uuid))
+                    }
+                }
             }
+            friendRequestsTemporary = [...friendRequestList];
+            if (friendRequestList.length === 0) return "no friend requests"
         }
 
         window.addFriend = async function (friendUsername) {
@@ -308,12 +394,17 @@
                 return "user not found"
             }
             try {
-                await setDoc(doc(db, "users", friendUUID, "friendRequests", uuid), {
+                const batch = writeBatch(db);
+                batch.set(doc(db, "users", friendUUID, "friendRequests", uuid), {
                     to: friendUUID,
                     from: uuid,
                     fromUsername: username,
                     status: "pending"
                 })
+                batch.update(doc(db, "users", uuid, "userData", "basics"), {
+                    outgoingFriends: arrayUnion(friendUUID)
+                })
+                batch.commit();
                 return "sent to " + friendUUID;
             } catch (error) {
                 return "error sending request"
@@ -724,6 +815,8 @@
                     userEmail = data.userEmail;
                     userWelcome.innerText = "Hello " + username + "!";
                     tasks = data.tasks;
+                    outgoingFriendsList = data.outgoingFriends;
+                    friends = data.friends;
                 }
                 await setUsesData();
             } catch (error) {
@@ -758,6 +851,8 @@
                         tasks: tasks,
                         projects: [],
                         completedTasks: 0,
+                        outgoingFriends: [],
+                        friends: [],
                     })
                     console.log("Saved!");
                 }
