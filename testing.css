@@ -27,6 +27,24 @@ body {
     row-gap: 10px;
 }
 
+.mainUserMenu {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    background-color: #eae9e9;
+    padding: 30px;
+    width: 100%;
+    height: 100%;
+    max-height: calc(100% - 30px);
+    max-width: calc(100% - 30px);
+    box-sizing: border-box;
+    text-align: center;
+    display: grid;
+    place-items: center;
+    align-content: center;
+    border-radius: 12px;
+    row-gap: 10px;
+    position: relative;    
+}
+
 .loginInput {
     background-color: rgba(29, 52, 148, 0.806);
     border-radius: 5px;
@@ -187,13 +205,40 @@ textarea {
     align-self: start;
     border: none;
     border-radius: 12px;
-    font-size: x-large;
-    padding: 5px;
+    font-size: medium;
+    padding: 10px;
     box-shadow: 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     background-color: rgb(183, 197, 235);
 }
 
+.settingsBar {
+    justify-self: start;
+    align-self: start;
+    border: none;
+    border-radius: 12px;
+    font-size: x-large;
+    padding: 5px;
+    box-shadow: 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    background-color: rgb(158, 170, 205); 
+    position: absolute;  
+}
+
 .settingsBtn:hover {
+    background-color: rgb(161, 176, 210);
+}
+
+.friendsBtn {
+    justify-self: start;
+    align-self: start;
+    border: none;
+    border-radius: 12px;
+    font-size: medium;
+    padding: 10px;
+    box-shadow: 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    background-color: rgb(183, 197, 235);   
+}
+
+.friendsBtn:hover {
     background-color: rgb(161, 176, 210);
 }
 

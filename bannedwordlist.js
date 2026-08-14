@@ -1,4 +1,11 @@
 const blockedWords = [
+    // website endings
+    ".com",
+    ".net",
+    ".org",
+    ".shop",
+    ".ai",
+    ".onion",
     // fuck
     "fuck",
     "fucks",

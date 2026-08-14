@@ -33,7 +33,7 @@
         <h6> LifeWiz | Copyright 2026 ⓒ </h6>
     </div>
 
-    <div id="signUpWelcome" class="background">
+    <div id="signUpWelcome" class="mainUserMenu">
         <h1>Welcome to LifeWiz Beta 1.1.1!</h1>
         <h2>If you need introductions, go to our <a target="_blank" rel="noopener noreferrer" href="https://glizanecz.github.io/ScwTracker/tutorial.html">tutorial page</a>!!</h2>
         <label for="userNickname">Set a nickname or have one auto generated!</label>
@@ -43,8 +43,11 @@
         <button class="loggedButtons" id="goToMainBtn">Dive right in!</button>
     </div>
 
+
     <div id="mainUserMenu" class="background">
-        <button class="settingsBtn">⚙️</button>
+        <div class="settingsBar">
+            <button id="friendsMenuBtn" class="friendsBtn">Friends</button> <button id="settingsMenuBtn" class="settingsBtn">⚙️</button>
+        </div>
         <h1 id="userWelcome">Hello!</h1>
         <button class="loggedButtons"  id="changeUsername">Change Username...</button>
         <h2>View all your tasks below!</h2>
@@ -67,7 +70,7 @@
         <label for="projPriorityInp">Priority: </label><input class="loggedInput" type="number" id="projPriorityInp">
         <label for="projDueDateInp">Select a due date...</label><input class="loggedInput"  id="projDueDateInp" type="date">
         <label for="projDueTimeInp">Select a time due...</label><input class="loggedInput"  id="projDueTimeInp" type="time" step="1">
-        <button class="loggedButtons" id="projCreateBtn">Create Task</button>
+        <button class="loggedButtons" id="projCreateBtn">Create Task</button> <button class="loggedButtons" id="cancelProjBtn">Cancel</button>
     </div>
 
     <div id="editOneTask" class="background">
@@ -88,6 +91,17 @@
         <label for="viewDueDate"></label><input id="viewDueDate" type="date" readonly>
         <label for="viewDueTime"></label><input id="viewDueTime" type="time" readonly>
         <button class="loggedButtons" id="viewingDone">I'm Done Viewing...</button>
+    </div>
+
+    <div id="friendsMenu" class="background">
+        <div class="settingsBar">
+            <button id="mainMenuFriends" class="friendsBtn">Main Menu</button> <button id="settingsMenuFriends" class="settingsBtn">⚙️</button>
+        </div>
+        <h1>Friends Menu</h1>
+        <h3>Friend people in order to collaborate with them!</h3>
+        <div id="friendsList">
+
+        </div>
     </div>
 
     <script src="adjnouns.js"></script>
@@ -171,6 +185,7 @@
         const projDueDateInp = document.getElementById("projDueDateInp");
         const projDueTimeInp = document.getElementById("projDueTimeInp");
         const projCreateBtn = document.getElementById("projCreateBtn");
+        const cancelProjBtn = document.getElementById("cancelProjBtn");
         //Elements for edit one task menu
         const editOneTask = document.getElementById("editOneTask");
         editOneTask.style.display = "none";
@@ -192,6 +207,15 @@
         const viewDueDate = document.getElementById("viewDueDate");
         const viewDueTime = document.getElementById("viewDueTime");
         const viewingDone = document.getElementById("viewingDone");
+        //Elements for friends menu
+        const friendsMenu = document.getElementById("friendsMenu");
+        friendsMenu.style.display = "none";
+        const friendsMenuBtn = document.getElementById("friendsMenuBtn");
+        const friendsList = document.getElementById("friendsList");
+        const settingsMenuFriends = document.getElementById("settingsMenuFriends");
+        const mainMenuFriends = document.getElementById("mainMenuFriends");
+        //Elements for settings menu
+        const settingsMenuBtn = document.getElementById("settingsMenuBtn");
 
 
         //Variables for whole project
@@ -204,6 +228,7 @@
         let taskVisualList = [];
         let priorityList = []
         let uuid = null;
+        let userDedicatedRefreshRate = 10_000;
         let usernameCoolSeconds = 0;
         let usernameSetCooldown = false;
         let projectListenerUnsubscribe = null;
@@ -224,6 +249,76 @@
         let priorityMethod = "Automatically (By Due Date)";
         //Variables for editing tasks
         let projectEditFocus = "";
+
+        mainMenuFriends.onclick = function() {
+            friendsMenu.style.display = "none";
+            mainUserMenu.style.display = "grid";     
+        }
+
+        settingsMenuFriends.onclick = function() {
+            friendsMenu.style.display = "none";
+        }
+
+        friendsMenuBtn.onclick = function() {
+            friendsMenu.style.display = "grid";
+            mainUserMenu.style.display = "none";
+        }
+
+        cancelProjBtn.onclick = function() {
+            projNameInp.value = "";
+            projDescInp.value = "";
+            projPriorityInp.value = "";
+            projDueDateInp.value = "";
+            projDueTimeInp.value = "";
+            projColabInp.value = "";       
+            addTaskMenu.style.display = "none";
+            mainUserMenu.style.display = "grid";
+        }
+
+        window.viewFriends = async function() {
+            const snapshot = await getDocs(collection(db, "users", uuid, "friendRequests"));
+            const friendRequestList = snapshot.docs.map(doc => ({
+                ...doc.data()
+            }));
+            if (friendRequestList.length === 0) console.log("No friend requests...");
+            for (const friendRequest of friendRequestList) {
+                console.log("Friend Request From " + friendRequest.fromUsername);
+                console.log("-~-~-~-~-~-~");
+            }
+        }
+
+        window.addFriend = async function (friendUsername) {
+            if (!navigator.onLine) return "offline"
+            let friendUUID;
+            let userFound = false;
+            const snapshot = await getDocs(collection(db, "uses"))
+            const uses = snapshot.docs.map(doc => ({
+                ...doc.data()
+            }));
+            for (const user of uses) {
+                let blockedList = user.blocked == undefined ? false : user.blocked.includes(uuid)
+                if (friendUsername === user.username) {
+                    friendUUID = user.uuid;
+                    userFound = true;
+                    if (blockedList) return "user blocked"
+                    break;
+                }
+            };
+            if (!userFound) {
+                return "user not found"
+            }
+            try {
+                await setDoc(doc(db, "users", friendUUID, "friendRequests", uuid), {
+                    to: friendUUID,
+                    from: uuid,
+                    fromUsername: username,
+                    status: "pending"
+                })
+                return "sent to " + friendUUID;
+            } catch (error) {
+                return "error sending request"
+            }
+        }
 
         window.deleteProject = async function (projectNumber) { 
             const root = currentTasks[projectNumber];
@@ -395,38 +490,40 @@
 
         changeUsername.onclick = async function () {
           if (usernameCoolSeconds === 0) {
-            let usernamePrompt = prompt("What would you like your username to be? (enter null or cancel for auto generated.)");
-            if (usernamePrompt !== null) {
+            let usernameCollection = [];
+            try {
+                const snapshot = await getDocs(collection(db,"uses"))
+                const uses = snapshot.docs.map(doc => ({
+                    ...doc.data()
+                }));
+                for (const user of uses) {
+                    usernameCollection.push(user.username);
+                };
+            } catch (error) {
+                console.error(error.message)
+            }
+            let usernamePrompt = prompt("What would you like your username to be? (enter 'null' or cancel for auto generated.)");
+            if (usernamePrompt !== "null") {
                 if (isTextProfane(usernamePrompt) === true) {
                     alert("Username is profane and invalid!")
-                    while (usernamePrompt.length > 12 || usernamePrompt.length === 0 || isTextProfane(usernamePrompt) || usernamePrompt == null) {
+                    while (usernamePrompt.length > 12 || usernamePrompt.length === 0 || isTextProfane(usernamePrompt) || usernamePrompt == null || usernameCollection.includes(usernamePrompt)) {
                         usernamePrompt = prompt("Please choose another username...");
                     }
-                    username = usernamePrompt.replaceAll(" ", "");
-                    userWelcome.innerText = "Hello " + username + "!";
-                    await setUserBasicsData(1);
-                    usernameCoolSeconds += 120;
-                    alert("Username set to " + username + "!")
                 } else if (usernamePrompt.length > 12) {
                     alert("Username can't be over 12 characters!")
-                    while (usernamePrompt.length > 12 || usernamePrompt.length === 0 || isTextProfane(usernamePrompt) || usernamePrompt == null) {
+                    while (usernamePrompt.length > 12 || usernamePrompt.length === 0 || isTextProfane(usernamePrompt) || usernamePrompt == null || usernameCollection.includes(usernamePrompt)) {
                         usernamePrompt = prompt("Please choose another username...");
                     }
-                    username = usernamePrompt.replaceAll(" ", "");
-                    userWelcome.innerText = "Hello " + username + "!";
-                    await setUserBasicsData(1);
-                    usernameCoolSeconds += 120;
-                    alert("Username set to " + username + "!")
                 } else if (usernamePrompt.length === 0) {
                     alert("Username can't be nothing!")
-                    while (usernamePrompt.length > 12 || usernamePrompt.length === 0 || isTextProfane(usernamePrompt) || usernamePrompt == null) {
+                    while (usernamePrompt.length > 12 || usernamePrompt.length === 0 || isTextProfane(usernamePrompt) || usernamePrompt == null || usernameCollection.includes(usernamePrompt)) {
                         usernamePrompt = prompt("Please choose another username...");
                     }
-                    username = usernamePrompt.replaceAll(" ", "");
-                    userWelcome.innerText = "Hello " + username + "!";
-                    await setUserBasicsData(1);
-                    usernameCoolSeconds += 120;
-                    alert("Username set to " + username + "!")
+                } else if (usernameCollection.includes(usernamePrompt)) {
+                    alert("Username is taken!")
+                    while (usernamePrompt.length > 12 || usernamePrompt.length === 0 || isTextProfane(usernamePrompt) || usernamePrompt == null || usernameCollection.includes(usernamePrompt)) {
+                        usernamePrompt = prompt("Please choose another username...");
+                    }
                 } else {
                     username = usernamePrompt.replaceAll(" ", "");
                     userWelcome.innerText = "Hello " + username + "!";
@@ -436,18 +533,21 @@
                 } 
             } else {
                 username = adjectives[Math.floor(Math.random() * adjectives.length)] + nouns[Math.floor(Math.random() * nouns.length)] + String(Math.floor(Math.random() * 10000));
-                userWelcome.innerText = "Hello " + username + "!";
-                await setUserBasicsData(1);
-                usernameCoolSeconds += 120;
-                alert("Username set to " + username + "!");
             }
           } else {
             if (usernameCoolSeconds === 1) {
                 alert("You cannot set your username for another 1 second!");
+                return;
             } else {
                 alert("You cannot set your username for another " + usernameCoolSeconds + " seconds!"); 
+                return;
             }
           }
+          userWelcome.innerText = "Hello " + username + "!";
+          await setUserBasicsData(1);
+          await setUsesData("username");
+          usernameCoolSeconds += 120;
+          alert("Username set to " + username + "!");
         }
 
         addTaskBtn.onclick = async function () {
@@ -510,6 +610,7 @@
             }
             userWelcome.innerText = "Hello " + username + "!";
             await setUserBasicsData(0)
+            await setUsesData("username");
             refreshDisplay();
             startProjectListener();
         }
@@ -621,6 +722,7 @@
                     userWelcome.innerText = "Hello " + username + "!";
                     tasks = data.tasks;
                 }
+                await setUsesData();
             } catch (error) {
                 console.log("User data couldn't be loaded!")
                 console.error(error);
@@ -661,6 +763,35 @@
                 console.error(error);
                 console.error(error.code);
                 console.error(error.message);
+            }
+        }
+
+        async function setUsesData(updateType, blockedUser = "none") {
+            try {
+                const snapshot = await getDoc(doc(db, "uses", uuid));
+                if (!snapshot.exists()) {
+                    await setDoc(doc(db, "uses", uuid), {
+                        uuid: uuid,
+                        username: username,
+                        blocked: []
+                    });
+                }
+                if (snapshot.exists() && updateType === "username") {
+                    await updateDoc(doc(db, "uses", uuid), {
+                        username: username,
+                    });
+                } else if (snapshot.exists() && updateType === "blocked" && blockedUser !== "none") {
+                    await updateDoc(doc(db, "uses", uuid), {
+                        blocked: arrayUnion(blockedUser)
+                    });
+                } else if (snapshot.exists() && updateType === "all") {
+                    await updateDoc(doc(db, "uses", uuid), {
+                        username: username,
+                        blocked: blockedUser === "none" ? arrayUnion("") : arrayUnion(blockedUser)
+                    });
+                }
+            } catch (error) {
+                console.error(error.message)
             }
         }
 
@@ -761,12 +892,16 @@
         })
 
         async function refreshDisplay() {
-            let sleepTimeForRefresh = 10_000;
+            let sleepTimeForRefresh = userDedicatedRefreshRate;
             while (uuid !== null) {
                 for (let i = 0; i < tasks; i++) {
-                    normalizeprojectsTemporary[i].projDueTime
+                    if (normalizeMilliseconds(findDateDistance(projectsTemporary[i].projDueTime, projectsTemporary[i].projDueDate)).includes("seconds!!!")) {
+                        sleepTimeForRefresh = 1_000;
+                    } else {
+                        sleepTimeForRefresh = userDedicatedRefreshRate;
+                    }
                 }
-                await sleep(10_000);
+                await sleep(sleepTimeForRefresh);
                 if (tasks > 0) displayList(projectsTemporary, priorityMethod);
             } 
         }

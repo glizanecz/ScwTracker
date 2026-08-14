@@ -51,7 +51,6 @@ function displayList(taskCol, sortMethod) {
     taskList.innerHTML = "";
     sortMethod === "Automatically (By Due Date)" ? allTasks = sortAutomatically(taskCol) : allTasks = sortByPriority(taskCol);
     window.currentTasks = allTasks;
-    console.log("sorted tasks: ", allTasks);
     for (let i = 0; i < allTasks.length; i++) {
         taskList.innerHTML += "<div class='taskListItem'> <h4>• " + allTasks[i].projName + " " + normalizeDate(allTasks[i].projDueDate) + " => " + timeNormalizer(allTasks[i].projDueTime) + "</h4>" + normalizeMilliseconds(findDateDistance(allTasks[i].projDueTime, allTasks[i].projDueDate)) + `<button class='loggedButtons' onclick='viewProject(${i})'> View </button> <button class='loggedButtons' onclick='editIndividual(${i})'> Edit </button> <button class='loggedButtons' onclick='deleteProject(${i})'> ❎ </button> <button class='loggedButtons' onclick='completeProject(${i})'> ✅ </button> </div>`;
     }
