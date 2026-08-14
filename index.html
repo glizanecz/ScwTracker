@@ -321,7 +321,7 @@
                 batch.update(doc(db, "uses", uuid), {
                     friends: arrayUnion(senderUUID)
                 })
-                batch.commit();
+                await batch.commit();
                 console.log("Friend Request Accepted...")
             } catch (error) {
                 console.error(error.message)
@@ -365,7 +365,9 @@
                         batch.update(doc(db, "users", uuid, "userData", "basics"), {
                             outgoingFriends: arrayRemove(outgoingFriend)
                         })
-                        batch.delete(doc(db, "users", outgoingFriend, "friendRequests", uuid))
+                        batch.delete(doc(db, "users", outgoingFriend, "friendRequests", uuid));
+                        batch.update(doc(db, "uses", uuid), { friends: arrayUnion(outgoingFriend) })
+                        await batch.commit()
                     }
                 }
             }
