@@ -109,6 +109,7 @@
         </div>
         <input id="addFriendInput">
         <button class="loggedButtons" id="submitFriendInput">Submit Friend Request</button>
+        <h6 id="addFriendOutcome"></h6>
     </div>
 
     <script src="adjnouns.js"></script>
@@ -227,6 +228,7 @@
         const friendsMenuViewing = document.getElementById("friendsMenuViewing");
         const addFriendInput = document.getElementById("addFriendInput");
         const submitFriendInput = document.getElementById("submitFriendInput");
+        const addFriendOutcome = document.getElementById("addFriendOutcome");
         //Elements for settings menu
         const settingsMenuBtn = document.getElementById("settingsMenuBtn");
 
@@ -268,7 +270,9 @@
         let friendSearchOn = false;
 
         submitFriendInput.onclick = async function() {
+            addFriendOutcome.innerText = "";
             await addFriend(addFriendInput.value);
+            addFriendInput.value = "";
         }
 
         mainMenuFriends.onclick = function() {
@@ -282,6 +286,7 @@
 
         friendsMenuBtn.onclick = async function() {
             friendsMenu.style.display = "grid";
+            addFriendOutcome.innerText = "";
             mainUserMenu.style.display = "none";
             await viewFriends();
             let friendsMenuViewingOpt = friendsMenuViewing.value;
@@ -437,11 +442,15 @@
                     friendUUID = user.uuid;
                     userFound = true;
                     if (blockedList) return "user blocked"
+                    addFriendOutcome.style.color = "red";
+                    addFriendOutcome.innerText = "User doesn't exist...";
                     break;
                 }
             };
             if (!userFound) {
                 return "user not found"
+                addFriendOutcome.style.color = "red";
+                addFriendOutcome.innerText = "User doesn't exist...";
             }
             try {
                 const batch = writeBatch(db);
@@ -457,8 +466,12 @@
                 })
                 batch.commit();
                 return "sent to " + friendUUID;
+                addFriendOutcome.style.color = "lime";
+                addFriendOutcome.innerText = "Friend Request Sent!";
             } catch (error) {
                 return "error sending request"
+                addFriendOutcome.style.color = "red";
+                addFriendOutcome.innerText = "Error sending request, try again later...";
             }
         }
 
