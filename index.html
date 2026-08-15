@@ -107,6 +107,8 @@
         <div id="friendsList" class="taskArea">
 
         </div>
+        <input id="addFriendInput">
+        <button class="loggedButtons" id="submitFriendInput">Submit Friend Request</button>
     </div>
 
     <script src="adjnouns.js"></script>
@@ -223,6 +225,8 @@
         const settingsMenuFriends = document.getElementById("settingsMenuFriends");
         const mainMenuFriends = document.getElementById("mainMenuFriends");
         const friendsMenuViewing = document.getElementById("friendsMenuViewing");
+        const addFriendInput = document.getElementById("addFriendInput");
+        const submitFriendInput = document.getElementById("submitFriendInput");
         //Elements for settings menu
         const settingsMenuBtn = document.getElementById("settingsMenuBtn");
 
@@ -262,6 +266,10 @@
         let friendRequestsTemporary = [];
         let friends = [];
         let friendSearchOn = false;
+
+        submitFriendInput.onclick = async function() {
+            await addFriend(addFriendInput.value);
+        }
 
         mainMenuFriends.onclick = function() {
             friendsMenu.style.display = "none";
