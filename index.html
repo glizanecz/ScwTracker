@@ -260,6 +260,7 @@
         //Variables for friends list
         let friendRequestsTemporary = [];
         let friends = [];
+        let friendSearchOn = false;
 
         mainMenuFriends.onclick = function() {
             friendsMenu.style.display = "none";
@@ -330,6 +331,15 @@
                 await batch.commit();
                 console.log("Friend Request Accepted...")
                 await deleteDoc(doc(db, "users", uuid, "friendRequests", senderUUID));
+                friendRequestsTemporary = friendRequestsTemporary.filter(request => request.from !== senderUUID);
+                friendsList.innerHTML = "";
+                for (const friendRequest of friendRequestsTemporary) {
+                    console.log(friendRequest)
+                    friendsList.innerHTML += `<div class='taskListItem'>
+                                                <h4>Friend Request From ${friendRequest.fromUsername}:</h4>
+                                                <h5>User ID: ${friendRequest.from}</h5>
+                                            </div>`
+                }
             } catch (error) {
                 console.error(error.message)
             }
@@ -360,6 +370,8 @@
 
         window.viewFriends = async function() {
             //getting all recieved friend requests
+            if (friendSearchOn === true) return;
+            friendSearchOn = true;
             const snapshot = await getDocs(collection(db, "users", uuid, "friendRequests"));
             const friendRequestList = snapshot.docs.map(doc => ({
                 ...doc.data()
@@ -388,9 +400,12 @@
                 }
             } catch (error) {
                 console.error(error.message);
+            } finally {
+                friendRequestsTemporary = [...friendRequestList];
+                if (friendRequestList.length === 0) return "no friend requests"
+                sleep(10_000)
+                friendSearchOn = false;
             }
-            friendRequestsTemporary = [...friendRequestList];
-            if (friendRequestList.length === 0) return "no friend requests"
         }
 
         window.addFriend = async function (friendUsername) {
