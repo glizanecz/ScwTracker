@@ -112,6 +112,24 @@
         <h6 id="addFriendOutcome"></h6>
     </div>
 
+    <div id="settingsMenu" class="background">
+        <div class="settingsBar">
+            <button id="settingsMainMenu" class="friendsBtn">Main Menu</button> <button id="settingsFriends" class="friendsBtn">Friends</button>
+        </div>
+        <h1>⚙️ Settings ⚙️</h1>
+        <h1>-~-~-~-~-~-~-~-</h1>
+        <h3>Task Display Refresh Rate (Low Effect On Performance Overall):</h3>
+        <p>
+            1. 1 minute per refresh (BEST PERFORMANCE)
+            2. 45 seconds per refresh (OK PERFORMANCE)
+            3. 30 seconds per refresh (NORMAL PERFORMANCE)
+            4. 10 seconds per refresh (SLOWEST PERFORMANCE)
+
+            (TIP: No matter what you select, when due dates are within seconds, it will refresh by the second...)
+        </p>
+        <label for="refreshRateInput">Refresh Rate Number: </label><input id="refreshRateInput" type="number" max="4" min="1">
+    </div>
+
     <script src="adjnouns.js"></script>
     <script src="bannedwordlist.js"></script>
     <script src="dateNormalize.js"></script>
@@ -230,7 +248,12 @@
         const submitFriendInput = document.getElementById("submitFriendInput");
         const addFriendOutcome = document.getElementById("addFriendOutcome");
         //Elements for settings menu
+        const settingsMenu = document.getElementById("settingsMenu");
         const settingsMenuBtn = document.getElementById("settingsMenuBtn");
+        const settingsMainMenu = document.getElementById("settingsMainMenu");
+        const settingsFriends = document.getElementById("settingsFriends");
+        const refreshRateInput = document.getElementById("refreshRateInput");
+
 
 
         //Variables for whole project
@@ -268,6 +291,25 @@
         let friendRequestsTemporary = [];
         let friends = [];
         let friendSearchOn = false;
+        //settings
+
+        refreshRateInput.onchange = function() {
+            let refreshRateNum = Number(refreshRateInput.value);
+            if (refreshRateNum === 1) userDedicatedRefreshRate = 60_000;
+            if (refreshRateNum === 2) userDedicatedRefreshRate = 45_000;
+            if (refreshRateNum === 3) userDedicatedRefreshRate = 30_000;
+            if (refreshRateNum === 4) userDedicatedRefreshRate = 10_000;
+        }
+
+        settingsMainMenu.onclick = function() {
+            settingsMenu.style.display = "none";
+            mainUserMenu.style.display = "grid";
+        }
+
+        settingsFriends.onclick = function() {
+            settingsMenu.style.display = "none";
+            friendsMenu.style.display = "grid";
+        }
 
         submitFriendInput.onclick = async function() {
             addFriendOutcome.innerText = "";
