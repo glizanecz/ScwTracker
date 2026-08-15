@@ -127,6 +127,7 @@
             </ul>
             <h5>(TIP: No matter what you select, when due dates are within seconds, it will refresh by the second...)</h5>
             <label for="refreshRateInput">Refresh Rate Number: </label><input id="refreshRateInput" type="number" max="4" min="1">
+            <button class="settingsApply" id="applyRefreshRate">Apply Refresh Rate</button>
         </div>
     </div>
 
@@ -254,6 +255,7 @@
         const settingsMainMenu = document.getElementById("settingsMainMenu");
         const settingsFriends = document.getElementById("settingsFriends");
         const refreshRateInput = document.getElementById("refreshRateInput");
+        const applyRefreshRate = document.getElementById("applyRefreshRate");
 
 
 
@@ -295,7 +297,9 @@
         let friendSearchOn = false;
         //settings
 
-        refreshRateInput.onchange = function() {
+        applyRefreshRate.onclick = refreshNumToRate;
+        
+        function refreshNumToRate() {
             let refreshRateNum = Number(refreshRateInput.value);
             if (refreshRateNum === 1) userDedicatedRefreshRate = 60_000;
             if (refreshRateNum === 2) userDedicatedRefreshRate = 45_000;

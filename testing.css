@@ -200,12 +200,19 @@ body {
     margin-bottom: 5px;
 }
 
-.loggedButtons:hover {
+
+.settingsApply {
     border-radius: 12px;
     border: none;
     padding: 10px;
-    background-color: rgb(141, 153, 184);
-    color: white;   
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    background-color: rgb(226, 226, 226);
+    color: rgb(4, 4, 4); 
+    margin-bottom: 5px;
+}
+
+.settingsApply:hover{
+    background-color: rgb(201, 201, 201);
 }
 
 .taskArea > * {
