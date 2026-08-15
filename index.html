@@ -354,22 +354,31 @@
         }
 
         window.viewFriends = async function() {
+            //getting all recieved friend requests
             const snapshot = await getDocs(collection(db, "users", uuid, "friendRequests"));
             const friendRequestList = snapshot.docs.map(doc => ({
                 ...doc.data()
             }));
-            const q = query(
-                collectionGroup(db, "friendRequests"),
-                where("status", "in", ["pending", "accepted"]),
-                where("to", "==", uuid)
-            )
-            const snapshot2 = await getDocs(q);
-            if (snapshot2.exists()) {
-                const data = snapshot2.data();
-                for (const outgoingFriend of data) {
-                    console.log("Friend Request From " + data[outgoingFriend]);
+            //getting all outgoing friend requests
+            const outgoingSnapshot = await getDocs(
+                collection(db, "outgoingRequests", uuid)
+            );
+            const requests = outgoingSnapshot.docs.map(doc => {
+                const receiverUID = doc.data().to;
+                return getDoc(
+                    doc(db, "users", receiverUID, "friendRequests", uuid)
+                );
+            });
+            //display
+            try {
+                const requestSnapshots = await Promise.all(requests);
+                for (const outgoingFriend of requestSnapshots) {
+                    const data = outgoingFriend.data();
+                    console.log("Friend Request From " + data.outgoingFriend);
                     console.log("-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-")
-                }  
+                } 
+            } catch (error) {
+                console.error(error.message);
             }
             friendRequestsTemporary = [...friendRequestList];
             if (friendRequestList.length === 0) return "no friend requests"
