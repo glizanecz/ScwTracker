@@ -102,6 +102,7 @@
         <select id="friendsMenuViewing">
             <option>View Friends</option>
             <option>View Requests</option>
+            <option>View Outgoing Requests</option>
         </select>
         <div id="friendsList" class="taskArea">
 
@@ -293,14 +294,20 @@
         friendsMenuViewing.onchange = async function () {
             await viewFriends();
             friendsList.innerHTML = "";
-            for (const friendRequest of friendRequestsTemporary) {
-                console.log(friendRequest)
-                friendsList.innerHTML += `<div class='friendsListItem friendsListButton'>
-                                            <h4>Friend Request From ${friendRequest.fromUsername}</h4>
-                                            <button onclick="acceptFriend('${friendRequest.from}')" class="loggedButtons">Accept</button>
-                                            <button onclick="denyFriend('${friendRequest.from}')" class="loggedButtons">Deny</button>
-                                            <button onclick="blockFriend('${friendRequest.from}')" class="loggedButtons">Block</button>
-                                        </div>`
+            if (friendsMenuViewing.value === "View Requests") {
+                for (const friendRequest of friendRequestsTemporary) {
+                    console.log(friendRequest)
+                    friendsList.innerHTML += `<div class='friendsListItem friendsListButton'>
+                                                <h4>Friend Request From ${friendRequest.fromUsername}</h4>
+                                                <button onclick="acceptFriend('${friendRequest.from}')" class="loggedButtons">Accept</button>
+                                                <button onclick="denyFriend('${friendRequest.from}')" class="loggedButtons">Deny</button>
+                                                <button onclick="blockFriend('${friendRequest.from}')" class="loggedButtons">Block</button>
+                                            </div>`
+                }
+            } else if (friendsMenuViewing === "View Friends") {
+                console.log("Nothing is here right now, updates coming soon...");
+            } else if (friendsMenuViewing === "View Outgoing Requests") {
+                console.log("Nothing is here right now, updates coming soon...");
             }
         }
 
