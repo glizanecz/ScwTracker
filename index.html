@@ -326,6 +326,7 @@
                 batch.update(doc(db, "uses", senderUUID), {
                     friends: arrayUnion(uuid)
                 })
+                batch.delete(doc(db, "users", senderUUID, "outgoingRequests", uuid))
                 await batch.commit();
                 console.log("Friend Request Accepted...")
                 await deleteDoc(doc(db, "users", uuid, "friendRequests", senderUUID));
