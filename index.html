@@ -361,7 +361,7 @@
             }));
             //getting all outgoing friend requests
             const outgoingSnapshot = await getDocs(
-                collection(db, "outgoingRequests", uuid)
+                collection(db, uuid, "outgoingRequests")
             );
             const requests = outgoingSnapshot.docs.map(doc => {
                 const receiverUID = doc.data().to;
