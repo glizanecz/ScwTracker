@@ -310,7 +310,7 @@
             projDueDateInp.value = "";
             projDueTimeInp.value = "";
             projColabInp.value = "";       
-            addTaskMenu.style.display = "none";
+            addTaskMensu.style.display = "none";
             mainUserMenu.style.display = "grid";
         }
 
@@ -323,8 +323,12 @@
                 batch.update(doc(db, "uses", uuid), {
                     friends: arrayUnion(senderUUID)
                 })
+                batch.update(doc(db, "uses", senderUUID), {
+                    friends: arrayUnion(uuid)
+                })
                 await batch.commit();
                 console.log("Friend Request Accepted...")
+                await deleteDoc(doc(db, "users", uuid, "friendRequests", senderUUID));
             } catch (error) {
                 console.error(error.message)
             }
