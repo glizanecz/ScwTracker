@@ -119,14 +119,14 @@
         <h1>⚙️ Settings ⚙️</h1>
         <h1>-~-~-~-~-~-~-~-</h1>
         <h3>Task Display Refresh Rate (Low Effect On Performance Overall):</h3>
-        <p>
-            1. 1 minute per refresh (BEST PERFORMANCE)
-            2. 45 seconds per refresh (OK PERFORMANCE)
-            3. 30 seconds per refresh (NORMAL PERFORMANCE)
-            4. 10 seconds per refresh (SLOWEST PERFORMANCE)
+        <ul>
+            <li>1. 1 minute per refresh (BEST PERFORMANCE)</li>
+            <li>2. 45 seconds per refresh (OK PERFORMANCE)</li>
+            <li>3. 30 seconds per refresh (NORMAL PERFORMANCE)</li>
+            <li>4. 10 seconds per refresh (SLOWEST PERFORMANCE)</li>
 
             (TIP: No matter what you select, when due dates are within seconds, it will refresh by the second...)
-        </p>
+        </ul>
         <label for="refreshRateInput">Refresh Rate Number: </label><input id="refreshRateInput" type="number" max="4" min="1">
     </div>
 
@@ -249,10 +249,12 @@
         const addFriendOutcome = document.getElementById("addFriendOutcome");
         //Elements for settings menu
         const settingsMenu = document.getElementById("settingsMenu");
+        settingsMenu.style.display = "none";
         const settingsMenuBtn = document.getElementById("settingsMenuBtn");
         const settingsMainMenu = document.getElementById("settingsMainMenu");
         const settingsFriends = document.getElementById("settingsFriends");
         const refreshRateInput = document.getElementById("refreshRateInput");
+
 
 
 
@@ -324,6 +326,12 @@
 
         settingsMenuFriends.onclick = function() {
             friendsMenu.style.display = "none";
+            settingsMenu.style.display = "grid";
+        }
+
+        settingsMenuBtn.onclick = function() {
+            mainUserMenu.style.display = "none";
+            settingsMenu.style.display = "grid";
         }
 
         friendsMenuBtn.onclick = async function() {
