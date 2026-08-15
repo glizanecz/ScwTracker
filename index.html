@@ -441,16 +441,16 @@
                 if (friendUsername === user.username) {
                     friendUUID = user.uuid;
                     userFound = true;
-                    if (blockedList) return "user blocked"
                     addFriendOutcome.style.color = "red";
                     addFriendOutcome.innerText = "User doesn't exist...";
+                    if (blockedList) return "user blocked"
                     break;
                 }
             };
             if (!userFound) {
-                return "user not found"
                 addFriendOutcome.style.color = "red";
                 addFriendOutcome.innerText = "User doesn't exist...";
+                return "user not found"
             }
             try {
                 const batch = writeBatch(db);
@@ -465,13 +465,13 @@
                     toUsername: friendUsername,             
                 })
                 batch.commit();
-                return "sent to " + friendUUID;
                 addFriendOutcome.style.color = "lime";
                 addFriendOutcome.innerText = "Friend Request Sent!";
+                return "sent to " + friendUUID;
             } catch (error) {
-                return "error sending request"
                 addFriendOutcome.style.color = "red";
                 addFriendOutcome.innerText = "Error sending request, try again later...";
+                return "error sending request"
             }
         }
 
