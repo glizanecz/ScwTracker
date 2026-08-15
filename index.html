@@ -374,9 +374,14 @@
                 const requestSnapshots = await Promise.all(requests);
                 for (const outgoingFriend of requestSnapshots) {
                     const data = outgoingFriend.data();
-                    console.log("Friend Request From " + data.outgoingFriend);
+                    console.log("Friend Request To " + data.toUsername);
                     console.log("-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-")
                 } 
+                for (const friendRequestSing of friendRequestList) {
+                    const friendRequestOne = friendRequestList[friendRequestSing];
+                    console.log("Friend Request From " + friendRequestOne.fromUsername);
+                    console.log("-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-")
+                }
             } catch (error) {
                 console.error(error.message);
             }
