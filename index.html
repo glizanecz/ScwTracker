@@ -134,6 +134,7 @@
             increment,
             serverTimestamp,
             collection,
+            collectionGroup,
             getDocs,
             onSnapshot,
             writeBatch,
@@ -256,7 +257,6 @@
         let projectEditFocus = "";
         //Variables for friends list
         let friendRequestsTemporary = [];
-        let outgoingFriendsList = [];
         let friends = [];
 
         mainMenuFriends.onclick = function() {
@@ -356,20 +356,18 @@
             const friendRequestList = snapshot.docs.map(doc => ({
                 ...doc.data()
             }));
-            for (const outgoingFriend of outgoingFriendsList) {
-                const snapshot = await getDoc(doc(db, "users", outgoingFriend, "friendRequests", uuid));
-                if (snapshot.exists()) {
-                    const data = snapshot.data();
-                    if (data.status === "accepted") {
-                        const batch = writeBatch(db);
-                        batch.update(doc(db, "users", uuid, "userData", "basics"), {
-                            outgoingFriends: arrayRemove(outgoingFriend)
-                        })
-                        batch.delete(doc(db, "users", outgoingFriend, "friendRequests", uuid));
-                        batch.update(doc(db, "uses", uuid), { friends: arrayUnion(outgoingFriend) })
-                        await batch.commit()
-                    }
-                }
+            const q = query(
+                collectionGroup(db, "friendRequests"),
+                where("status", "in", ["pending", "accepted"]),
+                where("to", "==", uuid)
+            )
+            const snapshot2 = await getDocs(q);
+            if (snapshot2.exists()) {
+                const data = snapshot2.data();
+                for (const outgoingFriend of data) {
+                    console.log("Friend Request From " + data[outgoingFriend]);
+                    console.log("-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-")
+                }  
             }
             friendRequestsTemporary = [...friendRequestList];
             if (friendRequestList.length === 0) return "no friend requests"
@@ -402,9 +400,6 @@
                     from: uuid,
                     fromUsername: username,
                     status: "pending"
-                })
-                batch.update(doc(db, "users", uuid, "userData", "basics"), {
-                    outgoingFriends: arrayUnion(friendUUID)
                 })
                 batch.commit();
                 return "sent to " + friendUUID;
@@ -817,7 +812,6 @@
                     userEmail = data.userEmail;
                     userWelcome.innerText = "Hello " + username + "!";
                     tasks = data.tasks;
-                    outgoingFriendsList = data.outgoingFriends;
                     friends = data.friends;
                 }
                 await setUsesData();
@@ -853,7 +847,6 @@
                         tasks: tasks,
                         projects: [],
                         completedTasks: 0,
-                        outgoingFriends: [],
                         friends: [],
                     })
                     console.log("Saved!");
