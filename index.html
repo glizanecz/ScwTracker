@@ -403,6 +403,10 @@
                     fromUsername: username,
                     status: "pending"
                 })
+                batch.set(doc(db, "users", uuid, "outgoingRequests", friendUUID), {
+                    to: friendUUID,
+                    toUsername: friendUsername,             
+                })
                 batch.commit();
                 return "sent to " + friendUUID;
             } catch (error) {
