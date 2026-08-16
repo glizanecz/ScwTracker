@@ -64,20 +64,20 @@
     </div>
 
     <div id="addTaskMenu" class="background">
-        <label for="projNameInp">Enter the name of your project...</label><input class="loggedInput" id="projNameInp" placeholder="Math homework #2"> 
-        <label for="projDescInp">Enter the description of your project...</label><textarea id="projDescInp" placeholder="Enter description here..."></textarea>
-        <label for="projColabInp">Add collaborators (collaborators must accept a friend request before joining)</label><input class="loggedInput"  id="projColabInp" placeholder="Jeremy92, Jamie9, etc...">
-        <label for="projPriorityInp">Priority: </label><input class="loggedInput" type="number" id="projPriorityInp">
+        <label for="projNameInp">Enter the name of your project...</label><input class="loggedInput" id="projNameInp" placeholder="Math homework #2" maxlength="50"> 
+        <label for="projDescInp">Enter the description of your project...</label><textarea id="projDescInp" placeholder="Enter description here..." maxlength="400"></textarea>
+        <label for="projColabInp">Add collaborators (collaborators must accept a friend request before joining)</label><input class="loggedInput"  id="projColabInp" placeholder="Jeremy92, Jamie9, etc..." maxlength="30">
+        <label for="projPriorityInp">Priority: </label><input class="loggedInput" type="number" id="projPriorityInp" max="50">
         <label for="projDueDateInp">Select a due date...</label><input class="loggedInput"  id="projDueDateInp" type="date">
         <label for="projDueTimeInp">Select a time due...</label><input class="loggedInput"  id="projDueTimeInp" type="time" step="1">
         <button class="loggedButtons" id="projCreateBtn">Create Task</button> <button class="loggedButtons" id="cancelProjBtn">Cancel</button>
     </div>
 
     <div id="editOneTask" class="background">
-        <label for="editNameInp">Edit the name of the project...</label><input class="loggedInput" id="editNameInp" placeholder="Math homework #2"> 
-        <label for="editDescInp">Edit the description of your project...</label><textarea id="editDescInp" placeholder="Enter description here..."></textarea>
-        <label for="editColabInp">Edit collaborators (collaborators must accept a friend request before joining)</label><input class="loggedInput"  id="editColabInp" placeholder="Jeremy92, Jamie9, etc...">
-        <label for="editPriorityInp">Edit priority: </label><input class="loggedInput" type="number" id="editPriorityInp">
+        <label for="editNameInp">Edit the name of the project...</label><input class="loggedInput" id="editNameInp" placeholder="Math homework #2" maxlength="50"> 
+        <label for="editDescInp">Edit the description of your project...</label><textarea id="editDescInp" placeholder="Enter description here..." maxlength="400"></textarea>
+        <label for="editColabInp">Edit collaborators (collaborators must accept a friend request before joining)</label><input class="loggedInput"  id="editColabInp" placeholder="Jeremy92, Jamie9, etc..." maxlength="30">
+        <label for="editPriorityInp">Edit priority: </label><input class="loggedInput" type="number" id="editPriorityInp" max="50">
         <label for="editDueDateInp">Edit the due date...</label><input class="loggedInput"  id="editDueDateInp" type="date">
         <label for="editDueTimeInp">Edit the time due...</label><input class="loggedInput"  id="editDueTimeInp" type="time" step="1">
         <button class="loggedButtons" id="cancelEditsBtn">Cancel</button><button class="loggedButtons" id="editSubmitBtn">Submit Task Edits</button>
