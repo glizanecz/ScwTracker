@@ -100,8 +100,8 @@
         <h1>Friends Menu</h1>
         <h3>Friend people in order to collaborate with them!</h3>
         <select id="friendsMenuViewing">
-            <option>View Friends</option>
             <option>View Requests</option>
+            <option>View Friends</option>
             <option>View Outgoing Requests</option>
         </select>
         <div id="friendsList" class="taskArea">
@@ -366,28 +366,29 @@
                 for (const friendRequest of friendRequestsTemporary) {
                     friendsList.innerHTML += `<div class='friendsListItem'>
                                                 <h4>Friend Request From ${friendRequest.fromUsername}</h4>
-                                                <button onclick="acceptFriend('${friendRequest.from}')" class="loggedButtons">Accept</button>
-                                                <button onclick="denyFriend('${friendRequest.from}')" class="loggedButtons">Deny</button>
-                                                <button onclick="blockFriend('${friendRequest.from}')" class="loggedButtons">Block</button>
+                                                <button onclick="acceptFriend('${friendRequest.from}')" class="loggedButtons">Accept ✅</button>
+                                                <button onclick="denyFriend('${friendRequest.from}')" class="loggedButtons">Deny 🚫</button>
+                                                <button onclick="blockFriend('${friendRequest.from}')" class="loggedButtons">Block ⛔</button>
                                             </div>`
                 }
             } else if (friendsMenuViewing === "View Friends") {
-                /*let friendUsernames = [];
+                let friendUsernames = [];
                 const snapshot = await getDocs(collection(db, "uses"));
                 if (snapshot.exists()) {
                     const data = snapshot.data();
                     const friendsWithUsernames = snapshot.docs.map(doc => ({
-                        ...doc.data().username
+                        ...doc.data()
                     }));
                     friendUsernames = [...friendsWithUsernames]
                 }
                 for (const friend of friendUsernames) {
                     friendsList.innerHTML += `<div class='friendsListItem'>
-                                                <h4>${friendUsernames}</h4>
-                                                <button onclick="acceptFriend('${friendRequest.from}')" class="loggedButtons">Accept</button>
-                                                <button onclick="denyFriend('${friendRequest.from}')" class="loggedButtons">Deny</button>
+                                                <h4>${friend.username}</h4>
+                                                <button onclick="removeFriend('${friend.uuid}')" class="loggedButtons">Remove 🚫</button>
+                                                <button onclick="blockFriend('${friend.uuid}')" class="loggedButtons">Block ⛔</button>
+                                                <button onclick="reportFriend('${friend.uuid}')" class="loggedButtons">Report 🚩</button>
                                             </div>`
-                }*/
+                }
             } else if (friendsMenuViewing === "View Outgoing Requests") {
                 console.log("Nothing is here right now, updates coming soon...");
             }
