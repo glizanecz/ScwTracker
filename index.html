@@ -294,6 +294,7 @@
         //Variables for friends list
         let friendRequestsTemporary = [];
         let friends = [];
+        let friendRemoves = [];
         let friendSearchOn = false;
         //settings
 
@@ -421,9 +422,10 @@
 
         window.denyFriend = async function(senderUUID) {
             try {
-                await updateDoc(doc(db,"users",uuid,"friendRequests",senderUUID), {
-                    status: "denied",
-                })
+                const batch = writeBatch(db);
+                batch.delete(doc(db,"users",uuid,"friendRequests",senderUUID));
+                batch.delete(doc(db, "users", senderUUID, "outgoingRequests", uuid));
+                await batch.commit();
             } catch (error) {
                 console.error(error.message)
             }
@@ -433,7 +435,8 @@
             try {
                 const batch = writeBatch(db)
 
-                batch.update(doc(db,"users",uuid,"friendRequests",senderUUID), { status: "blocked" });
+                batch.delete(doc(db,"users",uuid,"friendRequests",senderUUID), { status: "blocked" });
+                batch.delete(doc(db, "users", senderUUID, "outgoingRequests", uuid));
                 batch.update(doc(db, "uses", uuid), { blocked: arrayUnion(senderUUID) })
 
                 await batch.commit();
@@ -987,7 +990,8 @@
                     await setDoc(doc(db, "uses", uuid), {
                         uuid: uuid,
                         username: username,
-                        blocked: []
+                        blocked: [],
+                        friends: [],
                     });
                 }
                 if (snapshot.exists() && updateType === "username") {
@@ -1001,7 +1005,12 @@
                 } else if (snapshot.exists() && updateType === "all") {
                     await updateDoc(doc(db, "uses", uuid), {
                         username: username,
-                        blocked: blockedUser === "none" ? arrayUnion("") : arrayUnion(blockedUser)
+                        blocked: blockedUser === "none" ? arrayUnion("") : arrayUnion(blockedUser),
+                        friends: arrayRemove(friendRemoves)
+                    });
+                } else if (snapshot.exists() && updateType === "friends") {
+                    await updateDoc(doc(db, "uses", uuid), {
+                        friends: arrayRemove(friendRemoves)
                     });
                 }
             } catch (error) {
