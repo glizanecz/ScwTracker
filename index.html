@@ -364,8 +364,7 @@
             friendsList.innerHTML = "";
             if (friendsMenuViewing.value === "View Requests") {
                 for (const friendRequest of friendRequestsTemporary) {
-                    console.log(friendRequest)
-                    friendsList.innerHTML += `<div class='friendsListItem friendsListButton'>
+                    friendsList.innerHTML += `<div class='friendsListItem'>
                                                 <h4>Friend Request From ${friendRequest.fromUsername}</h4>
                                                 <button onclick="acceptFriend('${friendRequest.from}')" class="loggedButtons">Accept</button>
                                                 <button onclick="denyFriend('${friendRequest.from}')" class="loggedButtons">Deny</button>
@@ -373,10 +372,33 @@
                                             </div>`
                 }
             } else if (friendsMenuViewing === "View Friends") {
-                console.log("Nothing is here right now, updates coming soon...");
+                /*let friendUsernames = [];
+                const snapshot = await getDocs(collection(db, "uses"));
+                if (snapshot.exists()) {
+                    const data = snapshot.data();
+                    const friendsWithUsernames = snapshot.docs.map(doc => ({
+                        ...doc.data().username
+                    }));
+                    friendUsernames = [...friendsWithUsernames]
+                }
+                for (const friend of friendUsernames) {
+                    friendsList.innerHTML += `<div class='friendsListItem'>
+                                                <h4>${friendUsernames}</h4>
+                                                <button onclick="acceptFriend('${friendRequest.from}')" class="loggedButtons">Accept</button>
+                                                <button onclick="denyFriend('${friendRequest.from}')" class="loggedButtons">Deny</button>
+                                            </div>`
+                }*/
             } else if (friendsMenuViewing === "View Outgoing Requests") {
                 console.log("Nothing is here right now, updates coming soon...");
             }
+        }
+
+        window.removeFriend = function() {
+            //add function for this later
+        }
+
+        window.blockFriend = function() {
+            //add function for this later
         }
 
         cancelProjBtn.onclick = function() {
@@ -468,6 +490,12 @@
             const friendRequestList = snapshot.docs.map(doc => ({
                 ...doc.data()
             }));
+            //getting friends
+            const snapshot2 = await getDoc(doc(db, "uses", uuid));
+            if (snapshot2.exists()) {
+                const data = snapshot2.data();
+                friends = data.friends;
+            }
             //getting all outgoing friend requests
             const outgoingSnapshot = await getDocs(
                 collection(db, "users", uuid, "outgoingRequests")
@@ -495,7 +523,7 @@
             } finally {
                 friendRequestsTemporary = [...friendRequestList];
                 if (friendRequestList.length === 0) return "no friend requests"
-                sleep(10_000)
+                sleep(5_000)
                 friendSearchOn = false;
             }
         }
