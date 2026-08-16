@@ -409,7 +409,6 @@
                 friendRequestsTemporary = friendRequestsTemporary.filter(request => request.from !== senderUUID);
                 friendsList.innerHTML = "";
                 for (const friendRequest of friendRequestsTemporary) {
-                    console.log(friendRequest)
                     friendsList.innerHTML += `<div class='taskListItem'>
                                                 <h4>Friend Request From ${friendRequest.fromUsername}:</h4>
                                                 <h5>User ID: ${friendRequest.from}</h5>
@@ -426,6 +425,14 @@
                 batch.delete(doc(db,"users",uuid,"friendRequests",senderUUID));
                 batch.delete(doc(db, "users", senderUUID, "outgoingRequests", uuid));
                 await batch.commit();
+                friendRequestsTemporary = friendRequestsTemporary.filter(request => request.from !== senderUUID);
+                friendsList.innerHTML = "";
+                for (const friendRequest of friendRequestsTemporary) {
+                    friendsList.innerHTML += `<div class='taskListItem'>
+                                                <h4>Friend Request From ${friendRequest.fromUsername}:</h4>
+                                                <h5>User ID: ${friendRequest.from}</h5>
+                                            </div>`
+                }
             } catch (error) {
                 console.error(error.message)
             }
@@ -440,6 +447,14 @@
                 batch.update(doc(db, "uses", uuid), { blocked: arrayUnion(senderUUID) })
 
                 await batch.commit();
+                friendRequestsTemporary = friendRequestsTemporary.filter(request => request.from !== senderUUID);
+                friendsList.innerHTML = "";
+                for (const friendRequest of friendRequestsTemporary) {
+                    friendsList.innerHTML += `<div class='taskListItem'>
+                                                <h4>Friend Request From ${friendRequest.fromUsername}:</h4>
+                                                <h5>User ID: ${friendRequest.from}</h5>
+                                            </div>`
+                }
             } catch (error) {
                 console.error(error.message)
             }
