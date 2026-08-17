@@ -347,15 +347,18 @@
             let friendsMenuViewingOpt = friendsMenuViewing.value;
             if (friendsMenuViewingOpt === "View Friends") {
                 friendsList.innerHTML = "";
-            } else {
+            } else if (friendsMenuViewingOpt === "View Requests") {
                 friendsList.innerHTML = "";
                 for (const friendRequest of friendRequestsTemporary) {
-                    console.log(friendRequest)
-                    friendsList.innerHTML += `<div class='taskListItem'>
-                                                <h4>Friend Request From ${friendRequest.fromUsername}:</h4>
-                                                <h5>User ID: ${friendRequest.from}</h5>
+                    friendsList.innerHTML += `<div class='friendsListItem'>
+                                                <h4>Friend Request From ${friendRequest.fromUsername}</h4>
+                                                <button onclick="acceptFriend('${friendRequest.from}')" class="loggedButtons">Accept ✅</button>
+                                                <button onclick="denyFriend('${friendRequest.from}')" class="loggedButtons">Deny 🚫</button>
+                                                <button onclick="blockFriend('${friendRequest.from}')" class="loggedButtons">Block ⛔</button>
                                             </div>`
                 }
+            } else if (friendsMenuViewingOpt === "View Outgoing Requests") {
+                console.log("idk")
             }
         }
 
