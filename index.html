@@ -356,10 +356,23 @@
                             uuid: data.uuid,
                         });
                     }
-                }  
-                console.log(friends)  
+                } 
+                friendsList.innerHTML = "";
+                let friendsMenuViewingOpt = friendsMenuViewing.value;
+                if (friendsMenuViewingOpt === "View Outgoing Requests") {
+                    for (const friend of friends) {
+                        console.log(friend.username);
+                        console.log(friend.uuid);
+                        friendsList.innerHTML += `<div class='friendsListItem'>
+                                                    <h4>${friend.username}</h4>
+                                                    <button onclick="removeFriend('${friend.uuid}')" class="loggedButtons">Remove 🚫</button>
+                                                    <button onclick="blockFriend('${friend.uuid}')" class="loggedButtons">Block ⛔</button>
+                                                    <button onclick="reportFriend('${friend.uuid}')" class="loggedButtons">Report 🚩</button>
+                                                </div>`
+                        console.log(friends)  
+                    } 
+                }
             })
-
         }
 
         async function startRequestsListener () {
@@ -374,6 +387,18 @@
                     const data = doc.data();
                     friendRequestsTemporary += data;
                 })
+                let friendsMenuViewingOpt = friendsMenuViewing.value;
+                if (friendsMenuViewingOpt === "View Requests") {
+                    friendsList.innerHTML = "";
+                    for (const friendRequest of friendRequestsTemporary) {
+                        friendsList.innerHTML += `<div class='friendsListItem'>
+                                                    <h4>Friend Request From ${friendRequest.fromUsername}</h4>
+                                                    <button onclick="acceptFriend('${friendRequest.from}')" class="loggedButtons">Accept ✅</button>
+                                                    <button onclick="denyFriend('${friendRequest.from}')" class="loggedButtons">Deny 🚫</button>
+                                                    <button onclick="blockFriend('${friendRequest.from}')" class="loggedButtons">Block ⛔</button>
+                                                </div>`
+                    }
+                }
             })
         }
 
@@ -389,6 +414,16 @@
                     const data = doc.data();
                     friendsOutgoing.push(data);
                 })
+                let friendsMenuViewingOpt = friendsMenuViewing.value;
+                if (friendsMenuViewingOpt === "View Outgoing Requests") {
+                    friendsList.innerHTML = "";
+                    for (const outgoingRequest of friendsOutgoing) {
+                        friendsList.innerHTML += `<div class='friendsListItem'>
+                                                    <h4>Pending Request To ${outgoingRequest.toUsername}</h4>
+                                                    <button onclick="cancelRequest('${outgoingRequest.to}')" class="loggedButtons">Cancel 🚫</button>
+                                                </div>`
+                    }  
+                }
             })
         }
 
@@ -529,6 +564,7 @@
                 friends: arrayRemove(uuid)
             });
             friends = friends.filter(friendOne => friendOne.uuid !== friendRemoveID)
+            friendsList.innerHTML = "";
             for (const friend of friends) {
                 console.log(friend.username);
                 console.log(friend.uuid);
