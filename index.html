@@ -129,6 +129,10 @@
             <label for="refreshRateInput">Refresh Rate Number: </label><input id="refreshRateInput" type="number" max="4" min="1">
             <button class="settingsApply" id="applyRefreshRate">Apply Refresh Rate</button>
         </div>
+        <br>
+        <div class="backgroundSettings">
+            <button onclick="signOutButton()" class="loggedButtons">Sign Out</button>
+        </div>
     </div>
 
     <script src="adjnouns.js"></script>
@@ -136,6 +140,13 @@
     <script src="dateNormalize.js"></script>
     <script src="listdisplay.js"></script>
     <script type="module">
+
+        /*To Do:
+        1. Switch friend requests, friend viewing, and outgoing requests to unsubscribable 
+        snapshot listeners 
+        2. Add functionality for the remove, block, and report friend buttons on friends list
+        3. Another GUI overhaul, i still think it looks bad lol
+        */
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-analytics.js";
 
@@ -295,9 +306,91 @@
         //Variables for friends list
         let friendRequestsTemporary = [];
         let friends = [];
+        let friendsOutgoing = [];
         let friendRemoves = [];
         let friendSearchOn = false;
+        //friends related unsubscribers
+        let friendsListUnsubscribe = null;
+        let friendsOutgoingUnsubscribe = null;
+        let friendRequestsUnsubscribe = null;
         //settings
+
+        window.signOutButton = function () {
+            if (projectListenerUnsubscribe) {
+                projectListenerUnsubscribe();
+                projectListenerUnsubscribe = null;
+            }
+            if (friendRequestsUnsubscribe) {
+                friendRequestsUnsubscribe();
+                friendRequestsUnsubscribe = null;
+            }
+            if (friendsListUnsubscribe) {
+                friendsListUnsubscribe();
+                friendsListUnsubscribe = null;
+            }
+            signOut(auth)
+        }
+
+        async function startFriendsListener () {
+            let temporaryFriendUUIDs = [];
+            if (friendsListUnsubscribe) {
+                friendsListUnsubscribe();
+            }
+
+            friendsListUnsubscribe = onSnapshot(doc(db,"uses",uuid), async (snapshot) => {
+                readsAndWritesSession += 1;
+                if (snapshot.exists()) {
+                    friends = [];
+                    temporaryFriendUUIDs = [...snapshot.data().friends];      
+                }   
+
+                temporaryFriendUUIDs = snapshot.data().friends || [];
+
+                for (const friendTempUUID of temporaryFriendUUIDs) {
+                    readsAndWritesSession += 1;
+                    const snapshot2 = await getDoc(doc(db,"uses",friendTempUUID));
+                    if (snapshot2.exists()) {
+                        const data = snapshot2.data();
+                        friends.push({
+                            username: data.username,
+                            uuid: data.uuid,
+                        });
+                    }
+                }  
+                console.log(friends)  
+            })
+
+        }
+
+        async function startRequestsListener () {
+            if (friendRequestsUnsubscribe) {
+                friendRequestsUnsubscribe();
+            }
+            friendRequestsTemporary = [];
+            friendRequestsUnsubscribe = onSnapshot(collection(db, "users", uuid, "friendRequests"), (snapshot) => {
+                readsAndWritesSession += 1;
+                friendRequestsTemporary = [];
+                snapshot.forEach((doc) => {
+                    const data = doc.data();
+                    friendRequestsTemporary += data;
+                })
+            })
+        }
+
+        async function startOutgoingListener() {
+            if (friendsOutgoingUnsubscribe) {
+                friendsOutgoingUnsubscribe();
+            }
+            friendsOutgoing = [];
+            friendsOutgoingUnsubscribe = onSnapshot(collection(db,"users",uuid,"outgoingRequests"), (snapshot) => {
+                readsAndWritesSession += 1;
+                friendsOutgoing = [];
+                const requests = snapshot.docs.map((doc) => {
+                    const data = doc.data();
+                    friendsOutgoing.push(data);
+                })
+            })
+        }
 
         applyRefreshRate.onclick = refreshNumToRate;
         
@@ -347,24 +440,15 @@
             await viewFriends();
             let friendsMenuViewingOpt = friendsMenuViewing.value;
             if (friendsMenuViewingOpt === "View Friends") {
-                const friendFetch = await getDoc(doc(db, "uses", uuid));
-                readsAndWritesSession += 1;
-                if (friendFetch.exists()) {
-                    const friendFetchData = friendFetch.data().friends;
-                    friends = friendFetchData;
-                    for (const friend of friends) {
-                        const snapshot = await getDoc(doc(db, "uses", friend));
-                        readsAndWritesSession += 1;
-                        if (snapshot.exists()) {
-                            const data = snapshot.data();
-                            friendsList.innerHTML += `<div class='friendsListItem'>
-                                                        <h4>${data.username}</h4>
-                                                        <button onclick="removeFriend('${data.uuid}')" class="loggedButtons">Remove 🚫</button>
-                                                        <button onclick="blockFriend('${data.uuid}')" class="loggedButtons">Block ⛔</button>
-                                                        <button onclick="reportFriend('${data.uuid}')" class="loggedButtons">Report 🚩</button>
-                                                    </div>`
-                        }
-                    }
+                for (const friend of friends) {
+                    console.log(friend.username);
+                    console.log(friend.uuid);
+                    friendsList.innerHTML += `<div class='friendsListItem'>
+                                                <h4>${friend.username}</h4>
+                                                <button onclick="removeFriend('${friend.uuid}')" class="loggedButtons">Remove 🚫</button>
+                                                <button onclick="blockFriend('${friend.uuid}')" class="loggedButtons">Block ⛔</button>
+                                                <button onclick="reportFriend('${friend.uuid}')" class="loggedButtons">Report 🚩</button>
+                                            </div>`
                 }
             } else if (friendsMenuViewingOpt === "View Requests") {
                 friendsList.innerHTML = "";
@@ -377,7 +461,13 @@
                                             </div>`
                 }
             } else if (friendsMenuViewingOpt === "View Outgoing Requests") {
-                console.log("idk")
+                friendsList.innerHTML = "";
+                for (const outgoingRequest of friendsOutgoing) {
+                    friendsList.innerHTML += `<div class='friendsListItem'>
+                                                <h4>Pending Request To ${outgoingRequest.toUsername}</h4>
+                                                <button onclick="cancelRequest('${outgoingRequest.to}')" class="loggedButtons">Cancel 🚫</button>
+                                            </div>`
+                }    
             }
         }
 
@@ -394,35 +484,68 @@
                                             </div>`
                 }
             } else if (friendsMenuViewing.value === "View Friends") {
-                const friendFetch = await getDoc(doc(db, "uses", uuid));
-                readsAndWritesSession += 1;
-                if (friendFetch.exists()) {
-                    const friendFetchData = friendFetch.data().friends;
-                    friends = friendFetchData;
-                    for (const friend of friends) {
-                        const snapshot = await getDoc(doc(db, "uses", friend));
-                        readsAndWritesSession += 1;
-                        if (snapshot.exists()) {
-                            const data = snapshot.data();
-                            friendsList.innerHTML += `<div class='friendsListItem'>
-                                                        <h4>${data.username}</h4>
-                                                        <button onclick="removeFriend('${data.uuid}')" class="loggedButtons">Remove 🚫</button>
-                                                        <button onclick="blockFriend('${data.uuid}')" class="loggedButtons">Block ⛔</button>
-                                                        <button onclick="reportFriend('${data.uuid}')" class="loggedButtons">Report 🚩</button>
-                                                    </div>`
-                        }
-                    }
+                console.log(friends)
+                for (const friend of friends) {
+                    console.log(friend.username);
+                    console.log(friend.uuid);
+                    friendsList.innerHTML += `<div class='friendsListItem'>
+                                                <h4>${friend.username}</h4>
+                                                <button onclick="removeFriend('${friend.uuid}')" class="loggedButtons">Remove 🚫</button>
+                                                <button onclick="blockFriend('${friend.uuid}')" class="loggedButtons">Block ⛔</button>
+                                                <button onclick="reportFriend('${friend.uuid}')" class="loggedButtons">Report 🚩</button>
+                                            </div>`
                 }
             } else if (friendsMenuViewing.value === "View Outgoing Requests") {
-                console.log("Nothing is here right now, updates coming soon...");
+                friendsList.innerHTML = "";
+                for (const outgoingRequest of friendsOutgoing) {
+                    friendsList.innerHTML += `<div class='friendsListItem'>
+                                                <h4>Pending Request To ${outgoingRequest.toUsername}</h4>
+                                                <button onclick="cancelRequest('${outgoingRequest.to}')" class="loggedButtons">Cancel 🚫</button>
+                                            </div>`
+                }    
             }
         }
 
-        window.removeFriend = function() {
+        window.cancelRequest = async function(cancelingID) {
+            const batch = writeBatch(db);
+            batch.delete(doc(db, "users", cancelingID, "friendRequests", uuid));
+            batch.delete(doc(db, "users", uuid, "outgoingRequests", cancelingID));
+            await batch.commit();
+            friendsOutgoing = friendsOutgoing.filter(request => request.to !== cancelingID)
+            friendsList.innerHTML = "";
+            for (const outgoingRequest of friendsOutgoing) {
+                friendsList.innerHTML += `<div class='friendsListItem'>
+                                            <h4>Pending Request To ${outgoingRequest.toUsername}</h4>
+                                            <button onclick="cancelRequest('${outgoingRequest.to}')" class="loggedButtons">Cancel 🚫</button>
+                                        </div>`
+            }  
+        }
+
+        window.removeFriend = async function(friendRemoveID) {
+            await updateDoc(doc(db, "uses", uuid), {
+                friends: arrayRemove(friendRemoveID)
+            });
+            await updateDoc(doc(db, "uses", friendRemoveID), {
+                friends: arrayRemove(uuid)
+            });
+            friends = friends.filter(friendOne => friendOne.uuid !== friendRemoveID)
+            for (const friend of friends) {
+                console.log(friend.username);
+                console.log(friend.uuid);
+                friendsList.innerHTML += `<div class='friendsListItem'>
+                                            <h4>${friend.username}</h4>
+                                            <button onclick="removeFriend('${friend.uuid}')" class="loggedButtons">Remove 🚫</button>
+                                            <button onclick="blockFriend('${friend.uuid}')" class="loggedButtons">Block ⛔</button>
+                                            <button onclick="reportFriend('${friend.uuid}')" class="loggedButtons">Report 🚩</button>
+                                        </div>`
+            }
+        }
+
+        window.blockFriend = async function(blockFriendID) {
             //add function for this later
         }
 
-        window.blockFriend = function() {
+        window.reportFriend = async function(reportFriendID) {
             //add function for this later
         }
 
@@ -520,33 +643,18 @@
             const friendRequestList = snapshot.docs.map(doc => ({
                 ...doc.data()
             }));
-            //getting friends
-            const snapshot2 = await getDoc(doc(db, "uses", uuid));
-            readsAndWritesSession += 1;
-            if (snapshot2.exists()) {
-                const data = snapshot2.data();
-                friends = data.friends;
-            }
             //getting all outgoing friend requests
             const outgoingSnapshot = await getDocs(
                 collection(db, "users", uuid, "outgoingRequests")
             );
             readsAndWritesSession += 1;
-            const requests = outgoingSnapshot.docs.map(doc => {
-                const receiverUID = doc.data().to;
-                return getDoc(
-                    doc(db, "users", receiverUID, "friendRequests", uuid)
-                );
-            });
             //display
             try {
-                const requestSnapshots = await Promise.all(requests);
-                readsAndWritesSession += 1;
-                for (const outgoingFriend of requestSnapshots) {
+                for (const outgoingFriend of outgoingSnapshot.docs) {
                     const data = outgoingFriend.data();
+
                     console.log("Friend Request To " + data.toUsername);
-                    console.log("-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-")
-                } 
+                }
                 for (const friendRequestSing of friendRequestList) {
                     console.log("Friend Request From " + friendRequestSing.fromUsername);
                     console.log("-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-")
@@ -860,6 +968,14 @@
                     projectListenerUnsubscribe();
                     projectListenerUnsubscribe = null;
                 }
+                if (friendRequestsUnsubscribe) {
+                    friendRequestsUnsubscribe();
+                    friendRequestsUnsubscribe = null;
+                }
+                if (friendsListUnsubscribe) {
+                    friendsListUnsubscribe();
+                    friendsListUnsubscribe = null;
+                }
                 signOut(auth)
                 alert("Your internet disconnected! Reconnect and sign back in!")
             } else if (uuid !== null && uuid !== undefined) {
@@ -878,6 +994,9 @@
                 mainUserMenu.style.display = "grid";    
                 loadUserData();
                 startProjectListener();
+                startOutgoingListener();
+                startRequestsListener();
+                startFriendsListener();
             } else {
                 console.log("Couldn't login!")
             }
@@ -910,6 +1029,9 @@
             await setUsesData("username");
             refreshDisplay();
             startProjectListener();
+            startOutgoingListener();
+            startRequestsListener();
+            startFriendsListener();
         }
 
         async function signUp() {
@@ -971,6 +1093,9 @@
                 await loadUserData();
                 mainUserMenu.style.display = "grid";
                 startProjectListener();
+                startOutgoingListener();
+                startRequestsListener();
+                startFriendsListener();
             } else {
                 uuid = null;
                 loginMenuBack.style.display = "grid";
@@ -1023,7 +1148,6 @@
                     userEmail = data.userEmail;
                     userWelcome.innerText = "Hello " + username + "!";
                     tasks = data.tasks;
-                    friends = data.friends;
                 }
                 await setUsesData();
             } catch (error) {
