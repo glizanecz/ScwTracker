@@ -87,8 +87,13 @@
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 uuid = user.uid;
-                reportMenu.style.display = "grid";
-                placeholderText.style.display = "none";
+                try {
+                    await getDoc(doc(db, "adminCheck", "Check"))
+                    reportMenu.style.display = "grid";
+                    placeholderText.style.display = "none";
+                } catch (error) {
+                    
+                }
             } else {
                 uuid = null;
             }
