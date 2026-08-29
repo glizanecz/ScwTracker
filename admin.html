@@ -35,6 +35,9 @@
         const ignoreRep = document.getElementById("ignoreRep");
         const requestMore = document.getElementById("requestMore");
         let uuid = null;
+        let reportObjects = [];
+        let currentReport = 0;
+        let stillAwaitingAnswer = true;
 
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-analytics.js";
@@ -65,6 +68,7 @@
             writeBatch,
             arrayUnion,
             arrayRemove,
+            limit,
         } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";  
 
         const firebaseConfig = {
@@ -99,6 +103,53 @@
             }
         })
 
+        async function startViewing() {
+            try {
+                const colRef = collection(db, "reports");
+                const q = query(colRef, limit(20));
+                const querySnapshot = await getDocs(q);
+                querySnapshot.forEach((doc) => {
+                    reportObjects.push(doc.data())
+                })
+            } catch (error) {
+                console.error("Couldn't fetch reports! Error Reason: " + error.message);
+            }
+            while (reportObjects.length > 0) {
+                reportName.innerText = reportObjects[currentReport].reportName
+                reportDesc.innerText = reportObjects[currentReport].reportDesc
+                reportedUUID.innerText = reportObjects[currentReport].reported
+                reporterUUID.innerText = reportObjects[currentReport].reporter
+                while (stillAwaitingAnswer === true) {
+                    await sleep(100)
+                }
+                reportObjects = reportObjects.filter((doc) => doc.id != reportObjects[currentReport].id)
+
+            }
+        }
+
+        banUser.onclick = function () {
+            //put code for ban here
+            stillAwaitingAnswer = false;
+        }
+
+        warnUser.onclick = function () {
+            //put code for warn here
+            stillAwaitingAnswer = false;
+        }
+
+        ignoreRep.onclick = function () {
+            //put code for ignoring here
+            stillAwaitingAnswer = false;
+        }
+
+        requestMore.onclick = function() {
+            //put code for requesting here
+            stillAwaitingAnswer = false;
+        }
+
+        startViewing()
+
+        
 
 
 
