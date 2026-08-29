@@ -88,11 +88,11 @@
             if (user) {
                 uuid = user.uid;
                 try {
-                    await getDoc(doc(db, "adminCheck", "Check"))
+                    const data = await getDoc(doc(db, "adminCheck", "Check"))
                     reportMenu.style.display = "grid";
                     placeholderText.style.display = "none";
                 } catch (error) {
-                    
+
                 }
             } else {
                 uuid = null;
