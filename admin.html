@@ -9,32 +9,92 @@
     <link rel="stylesheet" href="testing.css">
 </head>
 <body>
-    <div class="LogSignBack">
-        <label for="username">Email:</label>
-        <br>
-        <input class="loginInput" id="username" type="text" minlength="11" maxlength="35">
-        <br>
-        <label for="password">Password:</label>
-        <br>
-        <input class="loginInput"  id="password" type="password" minlength="6" maxlength="20">
-        <br>
-        <button id="loginBtn" class="sbmt">Login...</button> 
-        <br>
-        <button id="signUpBtn" class="sbmt">Or Sign Up...</button>
-    </div>
-    <div class="background">
+    <h1 id="placeholderText">Insufficient Permissions...</h1>
+    <div id="reportMenu" class="background">
         <h1>Name of Report</h1>
-        <h1 class="loggedInput" placeholder="Report Name Here..."></h1>
+        <h1 id="reportName" class="loggedInput" placeholder="Report Name Here..."></h1>
         <h2>Report Description</h2>
-        <p class="loggedInput" placeholder="Report Description Here..."></p>
+        <p id="reportDesc" class="loggedInput" placeholder="Report Description Here..."></p>
         <h4>Reported UUID</h4> 
-        <h5 class="loggedInput"placeholder="Reported UUID Here..."></h5>
+        <h5 id="reportedUUID" class="loggedInput"placeholder="Reported UUID Here..."></h5>
         <h4>Reporter UUID</h4>
-        <h5 class="loggedInput" placeholder="Reporter UUID Here..."></h5>
-        <button>Ban Reported</button> <button>Warn Reported</button> <button>Ignore Report</button> <button>Request Further Info</button>
+        <h5 id="reporterUUID" class="loggedInput" placeholder="Reporter UUID Here..."></h5>
+        <button class="loggedButtons" id="banUser">Ban Reported</button> <button class="loggedButtons" id="warnUser">Warn Reported</button> <button class="loggedButtons" id="ignoreRep">Ignore Report</button> <button class="loggedButtons" id="requestMore">Request Further Info</button>
     </div>
 
     <script type="module">
+        const placeholderText = document.getElementById("placeholderText");
+        const reportMenu = document.getElementById("reportMenu");
+        reportMenu.style.display = "none";
+        const reportName = document.getElementById("reportName");
+        const reportDesc = document.getElementById("reportDesc");
+        const reportedUUID = document.getElementById("reportedUUID");
+        const reporterUUID = document.getElementById("reporterUUID");
+        const banUser = document.getElementById("banUser");
+        const warnUser = document.getElementById("warnUser");
+        const ignoreRep = document.getElementById("ignoreRep");
+        const requestMore = document.getElementById("requestMore");
+
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-analytics.js";
+
+        import {
+            getAuth,
+            createUserWithEmailAndPassword,
+            signInWithEmailAndPassword,
+            signOut,
+            onAuthStateChanged
+        } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+
+        import {
+            getFirestore,
+            doc,
+            getDoc,
+            deleteDoc,
+            setDoc,
+            updateDoc,
+            increment,
+            serverTimestamp,
+            collection,
+            query,
+            where,
+            collectionGroup,
+            getDocs,
+            onSnapshot,
+            writeBatch,
+            arrayUnion,
+            arrayRemove,
+        } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";  
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDR4uhiy7JQXSv0KV5VYbFpAOPK4fxSUls",
+            authDomain: "scwtrack-7d301.firebaseapp.com",
+            databaseURL: "https://scwtrack-7d301-default-rtdb.firebaseio.com",
+            projectId: "scwtrack-7d301",
+            storageBucket: "scwtrack-7d301.firebasestorage.app",
+            messagingSenderId: "211365189850",
+            appId: "1:211365189850:web:94d0607c4636d415d06de3",
+            measurementId: "G-SVYCRR65TK"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                uuid = user.uid;
+                reportMenu.style.display = "grid";
+                placeholderText.style.display = "none";
+            } else {
+                uuid = null;
+            }
+        })
+
+
+
 
     </script>
 
