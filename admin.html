@@ -101,6 +101,7 @@
                 } catch (error) {
                     console.error(error.message)
                 }
+                await startViewing()
             } else {
                 uuid = null;
             }
@@ -184,8 +185,6 @@
             stillAwaitingAnswer = false;
             clickOption = "ignore"
         }
-
-        await startViewing()
 
         
 
