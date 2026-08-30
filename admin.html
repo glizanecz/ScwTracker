@@ -140,6 +140,8 @@
                         banned: "true"
                     }, { merge: true })
                     batch.delete(doc(db, "reports", reportInfo.id))
+                } else if (clickOption === "ignore") {
+                    batch.delete(doc(db, "reports", reportInfo.id))
                 }
                 currentReport++;
             }
