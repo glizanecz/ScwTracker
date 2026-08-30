@@ -117,7 +117,7 @@
             } catch (error) {
                 console.error("Couldn't fetch reports! Error Reason: " + error.message);
             }
-            const batch = writeBatch(db);
+            let batch = writeBatch(db);
             while (reportObjects.length > currentReport) {
                 stillAwaitingAnswer = true;
                 const reportInfo = reportObjects[currentReport];
@@ -145,8 +145,22 @@
                 }
                 currentReport++;
             }
-            await batch.commit()
-            
+            reportName.innerText = "Report Name Here...";
+            reportDesc.innerText = "Report Description Here...";
+            reportedUUID.innerText = "Reported UUID Here...";
+            reporterUUID.innerText = "Reporter UUID Here...";
+            let doubleCheck = prompt("Are you sure you want to submit this batch? (Yes or No)");
+            if (doubleCheck === "yes" || doubleCheck === "Yes") {
+                let tripleCheck = prompt("Last chance... (Yes or No)")
+                if (tripleCheck === "yes" || tripleCheck === "Yes") {
+                    await batch.commit()
+                } else {
+                    batch = writeBatch(db);
+                }
+            } else {
+                batch = writeBatch(db);
+            }
+            startViewing();      
         }
 
         banUser.onclick = function () {
