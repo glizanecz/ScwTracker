@@ -117,6 +117,7 @@
                 querySnapshot.forEach((doc) => {
                     reportObjects.push({id: doc.id, ...doc.data()})
                 })
+                if (reportObjects.length === 0) return
                 let batch = writeBatch(db);
                 while (reportObjects.length > currentReport) {
                     stillAwaitingAnswer = true;
