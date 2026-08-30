@@ -38,6 +38,10 @@
         let reportObjects = [];
         let currentReport = 0;
         let stillAwaitingAnswer = true;
+        let bans = [];
+        let warns = [];
+        let requestsForInfo = [];
+        let clickOption = ""
 
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-analytics.js";
@@ -114,36 +118,67 @@
             } catch (error) {
                 console.error("Couldn't fetch reports! Error Reason: " + error.message);
             }
-            while (reportObjects.length > currentReport + 1) {
-                reportName.innerText = reportObjects[currentReport].reportName
-                reportDesc.innerText = reportObjects[currentReport].reportDesc
-                reportedUUID.innerText = reportObjects[currentReport].reported
-                reporterUUID.innerText = reportObjects[currentReport].reporter
+            while (reportObjects.length > currentReport) {
+                stillAwaitingAnswer = true;
+                const reportInfo = reportObjects[currentReport];
+                reportName.innerText = reportInfo.reportName
+                reportDesc.innerText = reportInfo.reportDesc
+                reportedUUID.innerText = reportInfo.reported
+                reporterUUID.innerText = reportInfo.reporter
                 while (stillAwaitingAnswer === true) {
                     await sleep(100)
                 }
+                if (clickOption === "warn")
+                    warns.push(reportInfo.reported)
+                if (clickOption === "ban")
+                    bans.push(reportInfo.reported)
+                if (clickOption === "request")
+                    requestsForInfo.push(reportInfo.reporter)
                 currentReport++;
             }
+
+            const batch = writeBatch(db);
+            for (const ban of bans) {
+                batch.set(doc(db, "users", ban, "userData", "banData"), {
+                    banned: "true"
+                }, { merge: true })
+            }
+            for (const warn of warns) {
+                batch.set(doc(db, "users", ban, "userData", "banData"), {
+                    warns: increment(1)
+                }, { merge: true })
+            }
+            for (const requestForInfo of requestsForInfo) {
+                batch.set(doc(db, "users", ban, "userData", "banData"), {
+                    banned: "true"
+                }, { merge: true })
+            }
+            await batch.commit()
+
         }
 
         banUser.onclick = function () {
             //put code for ban here
             stillAwaitingAnswer = false;
+            clickOption = "ban"
         }
 
         warnUser.onclick = function () {
             //put code for warn here
             stillAwaitingAnswer = false;
+            clickOption = "warn"
         }
 
         ignoreRep.onclick = function () {
             //put code for ignoring here
             stillAwaitingAnswer = false;
+            clickOption = "ignore"
         }
 
         requestMore.onclick = function() {
             //put code for requesting here
             stillAwaitingAnswer = false;
+            clickOption = "request"
         }
 
         startViewing()
