@@ -107,6 +107,8 @@
         })
 
         async function startViewing() {
+            reportObjects = [];
+            currentReport = 0;
             try {
                 const colRef = collection(db, "reports");
                 const q = query(colRef, limit(20));
@@ -114,53 +116,55 @@
                 querySnapshot.forEach((doc) => {
                     reportObjects.push({id: doc.id, ...doc.data()})
                 })
-            } catch (error) {
-                console.error("Couldn't fetch reports! Error Reason: " + error.message);
-            }
-            let batch = writeBatch(db);
-            while (reportObjects.length > currentReport) {
-                stillAwaitingAnswer = true;
-                const reportInfo = reportObjects[currentReport];
-                reportName.innerText = reportInfo.reportName
-                reportDesc.innerText = reportInfo.reportDesc
-                reportedUUID.innerText = reportInfo.reported
-                reporterUUID.innerText = reportInfo.reporter
-                while (stillAwaitingAnswer === true) {
-                    await sleep(100)
+                let batch = writeBatch(db);
+                while (reportObjects.length > currentReport) {
+                    stillAwaitingAnswer = true;
+                    const reportInfo = reportObjects[currentReport];
+                    reportName.innerText = reportInfo.reportName
+                    reportDesc.innerText = reportInfo.reportDesc
+                    reportedUUID.innerText = reportInfo.reported
+                    reporterUUID.innerText = reportInfo.reporter
+                    while (stillAwaitingAnswer === true) {
+                        await sleep(100)
+                    }
+                    if (clickOption === "warn") {
+                        warns.push(reportInfo.reported)
+                        batch.set(doc(db, "users", reportInfo.reported, "userData", "banData"), {
+                            warns: increment(1)
+                        }, { merge: true })
+                        batch.delete(doc(db,"reports",reportInfo.id))
+                    } else if (clickOption === "ban") {
+                        bans.push(reportInfo.reported)
+                        batch.set(doc(db, "users", reportInfo.reported, "userData", "banData"), {
+                            banned: "true"
+                        }, { merge: true })
+                        batch.delete(doc(db, "reports", reportInfo.id))
+                    } else if (clickOption === "ignore") {
+                        batch.delete(doc(db, "reports", reportInfo.id))
+                    }
+                    currentReport++;
                 }
-                if (clickOption === "warn") {
-                    warns.push(reportInfo.reported)
-                    batch.set(doc(db, "users", reportInfo.reported, "userData", "banData"), {
-                        warns: increment(1)
-                    }, { merge: true })
-                    batch.delete(doc(db,"reports",reportInfo.id))
-                } else if (clickOption === "ban") {
-                    bans.push(reportInfo.reported)
-                    batch.set(doc(db, "users", reportInfo.reported, "userData", "banData"), {
-                        banned: "true"
-                    }, { merge: true })
-                    batch.delete(doc(db, "reports", reportInfo.id))
-                } else if (clickOption === "ignore") {
-                    batch.delete(doc(db, "reports", reportInfo.id))
-                }
-                currentReport++;
-            }
-            reportName.innerText = "Report Name Here...";
-            reportDesc.innerText = "Report Description Here...";
-            reportedUUID.innerText = "Reported UUID Here...";
-            reporterUUID.innerText = "Reporter UUID Here...";
-            let doubleCheck = prompt("Are you sure you want to submit this batch? (Yes or No)");
-            if (doubleCheck === "yes" || doubleCheck === "Yes") {
-                let tripleCheck = prompt("Last chance... (Yes or No)")
-                if (tripleCheck === "yes" || tripleCheck === "Yes") {
-                    await batch.commit()
+                reportName.innerText = "Report Name Here...";
+                reportDesc.innerText = "Report Description Here...";
+                reportedUUID.innerText = "Reported UUID Here...";
+                reporterUUID.innerText = "Reporter UUID Here...";
+                let doubleCheck = prompt("Are you sure you want to submit this batch? (Yes or No)");
+                if (doubleCheck === "yes" || doubleCheck === "Yes") {
+                    let tripleCheck = prompt("Last chance... (Yes or No)")
+                    if (tripleCheck === "yes" || tripleCheck === "Yes") {
+                        await batch.commit()
+                        startViewing(); 
+                    } else {
+                        batch = writeBatch(db);
+                        startViewing(); 
+                    }
                 } else {
                     batch = writeBatch(db);
-                }
-            } else {
-                batch = writeBatch(db);
-            }
-            startViewing();      
+                    startViewing(); 
+                }   
+            } catch (error) {
+                console.error("Couldn't fetch reports! Error Reason: " + error.message);
+            }  
         }
 
         banUser.onclick = function () {
