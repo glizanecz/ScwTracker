@@ -109,12 +109,12 @@
                 const q = query(colRef, limit(20));
                 const querySnapshot = await getDocs(q);
                 querySnapshot.forEach((doc) => {
-                    reportObjects.push(doc.data())
+                    reportObjects.push({id: doc.id, ...doc.data()})
                 })
             } catch (error) {
                 console.error("Couldn't fetch reports! Error Reason: " + error.message);
             }
-            while (reportObjects.length > 0) {
+            while (reportObjects.length > currentReport + 1) {
                 reportName.innerText = reportObjects[currentReport].reportName
                 reportDesc.innerText = reportObjects[currentReport].reportDesc
                 reportedUUID.innerText = reportObjects[currentReport].reported
@@ -122,8 +122,7 @@
                 while (stillAwaitingAnswer === true) {
                     await sleep(100)
                 }
-                reportObjects = reportObjects.filter((doc) => doc.id != reportObjects[currentReport].id)
-
+                currentReport++;
             }
         }
 
