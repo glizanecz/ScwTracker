@@ -19,7 +19,7 @@
         <h5 id="reportedUUID" class="loggedInput"placeholder="Reported UUID Here..."></h5>
         <h4>Reporter UUID</h4>
         <h5 id="reporterUUID" class="loggedInput" placeholder="Reporter UUID Here..."></h5>
-        <button class="loggedButtons" id="banUser">Ban Reported</button> <button class="loggedButtons" id="warnUser">Warn Reported</button> <button class="loggedButtons" id="ignoreRep">Ignore Report</button> <button class="loggedButtons" id="requestMore">Request Further Info</button>
+        <button class="loggedButtons" id="banUser">Ban Reported</button> <button class="loggedButtons" id="warnUser">Warn Reported</button> <button class="loggedButtons" id="ignoreRep">Ignore Report</button>
     </div>
 
     <script type="module">
@@ -33,7 +33,6 @@
         const banUser = document.getElementById("banUser");
         const warnUser = document.getElementById("warnUser");
         const ignoreRep = document.getElementById("ignoreRep");
-        const requestMore = document.getElementById("requestMore");
         let uuid = null;
         let reportObjects = [];
         let currentReport = 0;
@@ -118,6 +117,7 @@
             } catch (error) {
                 console.error("Couldn't fetch reports! Error Reason: " + error.message);
             }
+            const batch = writeBatch(db);
             while (reportObjects.length > currentReport) {
                 stillAwaitingAnswer = true;
                 const reportInfo = reportObjects[currentReport];
@@ -128,33 +128,23 @@
                 while (stillAwaitingAnswer === true) {
                     await sleep(100)
                 }
-                if (clickOption === "warn")
+                if (clickOption === "warn") {
                     warns.push(reportInfo.reported)
-                if (clickOption === "ban")
+                    batch.set(doc(db, "users", reportInfo.reported, "userData", "banData"), {
+                        warns: increment(1)
+                    }, { merge: true })
+                    batch.delete(doc(db,"reports",reportInfo.id))
+                } else if (clickOption === "ban") {
                     bans.push(reportInfo.reported)
-                if (clickOption === "request")
-                    requestsForInfo.push(reportInfo.reporter)
+                    batch.set(doc(db, "users", reportInfo.reported, "userData", "banData"), {
+                        banned: "true"
+                    }, { merge: true })
+                    batch.delete(doc(db, "reports", reportInfo.id))
+                }
                 currentReport++;
             }
-
-            const batch = writeBatch(db);
-            for (const ban of bans) {
-                batch.set(doc(db, "users", ban, "userData", "banData"), {
-                    banned: "true"
-                }, { merge: true })
-            }
-            for (const warn of warns) {
-                batch.set(doc(db, "users", ban, "userData", "banData"), {
-                    warns: increment(1)
-                }, { merge: true })
-            }
-            for (const requestForInfo of requestsForInfo) {
-                batch.set(doc(db, "users", ban, "userData", "banData"), {
-                    banned: "true"
-                }, { merge: true })
-            }
             await batch.commit()
-
+            
         }
 
         banUser.onclick = function () {
@@ -173,12 +163,6 @@
             //put code for ignoring here
             stillAwaitingAnswer = false;
             clickOption = "ignore"
-        }
-
-        requestMore.onclick = function() {
-            //put code for requesting here
-            stillAwaitingAnswer = false;
-            clickOption = "request"
         }
 
         startViewing()
