@@ -153,14 +153,14 @@
                     let tripleCheck = prompt("Last chance... (Yes or No)")
                     if (tripleCheck === "yes" || tripleCheck === "Yes") {
                         await batch.commit()
-                        startViewing(); 
+                        await startViewing(); 
                     } else {
                         batch = writeBatch(db);
-                        startViewing(); 
+                        await startViewing(); 
                     }
                 } else {
                     batch = writeBatch(db);
-                    startViewing(); 
+                    await startViewing(); 
                 }   
             } catch (error) {
                 console.error("Couldn't fetch reports! Error Reason: " + error.message);
@@ -185,7 +185,7 @@
             clickOption = "ignore"
         }
 
-        startViewing()
+        await startViewing()
 
         
 
