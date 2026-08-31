@@ -885,44 +885,69 @@
         window.deleteProject = async function (projectNumber) { 
             const root = currentTasks[projectNumber];
             const projDelID = root.id;
+            if (root.owner === uuid) {
+                const batch = writeBatch(db);
 
-            const batch = writeBatch(db);
+                const taskRefA = doc(db, "colabs", root.id)
+                batch.delete(taskRefA)
 
-            const taskRefA = doc(db, "users", uuid, "projects", projDelID)
-            batch.delete(taskRefA)
+                await batch.commit();
+                readsAndWritesSession += 1;
+            } else if (root.owner === undefined) {
+                const batch = writeBatch(db);
 
-            const taskRefB = doc(db, "users", uuid, "userData", "projectData");
-            batch.update(taskRefB, { unusedProjects: arrayUnion(projDelID) })
+                const taskRefA = doc(db, "users", uuid, "projects", projDelID)
+                batch.delete(taskRefA)
 
-            const taskRefC = doc(db, "users", uuid, "userData", "basics");
-            tasks--
-            batch.update(taskRefC, { tasks: tasks });
+                const taskRefB = doc(db, "users", uuid, "userData", "projectData");
+                batch.update(taskRefB, { unusedProjects: arrayUnion(projDelID) })
 
-            await batch.commit();
-            readsAndWritesSession += 1;
+                const taskRefC = doc(db, "users", uuid, "userData", "basics");
+                tasks--
+                batch.update(taskRefC, { tasks: tasks });
+
+                await batch.commit();
+                readsAndWritesSession += 1;
+            } else {
+                console.log("No permissions for deleting this project...")
+            }
         }
 
         window.completeProject = async function (projectNumber) { 
             const root = currentTasks[projectNumber];
             const projDelID = root.id;
+            if (root.owner === undefined) {
+                const batch = writeBatch(db);
 
-            const batch = writeBatch(db);
+                const taskRefA = doc(db, "users", uuid, "projects", projDelID)
+                batch.delete(taskRefA)
 
-            const taskRefA = doc(db, "users", uuid, "projects", projDelID)
-            batch.delete(taskRefA)
+                const taskRefB = doc(db, "users", uuid, "userData", "projectData");
+                batch.update(taskRefB, { unusedProjects: arrayUnion(projDelID) })
 
-            const taskRefB = doc(db, "users", uuid, "userData", "projectData");
-            batch.update(taskRefB, { unusedProjects: arrayUnion(projDelID) })
+                const taskRefC = doc(db, "users", uuid, "userData", "basics");
+                batch.update(taskRefC, { completedTasks: increment(1) });
 
-            const taskRefC = doc(db, "users", uuid, "userData", "basics");
-            batch.update(taskRefC, { completedTasks: increment(1) });
+                const taskRefD = doc(db, "users", uuid, "userData", "basics");
+                tasks--
+                batch.update(taskRefD, { tasks: tasks });
 
-            const taskRefD = doc(db, "users", uuid, "userData", "basics");
-            tasks--
-            batch.update(taskRefD, { tasks: tasks });
+                await batch.commit();
+                readsAndWritesSession += 1;
+            } else if (root.owner === uuid) {
+                const batch = writeBatch(db);
 
-            await batch.commit();
-            readsAndWritesSession += 1;
+                const taskRefA = doc(db, "colabs", root.id)
+                batch.delete(taskRefA)
+
+                const taskRefB = doc(db, "users", uuid, "userData", "basics");
+                batch.update(taskRefB, { completedTasks: increment(1) });
+
+                await batch.commit();
+                readsAndWritesSession += 1;     
+            } else {
+                console.log("No permissions to 'complete' this colab project...")
+            }
         }
 
 
@@ -940,29 +965,56 @@
         }
 
         editSubmitBtn.onclick = async function() {
-            let editObject = {
-                projName: editNameInp.value,
-                projDueDate: editDueDateInp.value,
-                projDueTime: editDueTimeInp.value,
-                projDesc: editDescInp.value,
-                projContributors: editColabInp.value.replaceAll(" ", "").split(","),
-                priority: editPriorityInp.value,
+            if (currentEditingTask.colab !== undefined) {
+                const colabsListEdit = editColabInp.value.replaceAll(" ", "").split(",");
+                if (colabsListEdit.includes(uuid)) {
+
+                } else {
+                    colabsListEdit.push(uuid);
+                }
+                let editObject = {
+                    ProjName: editNameInp.value,
+                    ProjDesc: editDescInp.value,
+                    ProjDueDate: `${editDueDateInp.value}T${editDueTimeInp.value}`,
+                    Colabs: colabsListEdit,
+                }
+                editNameInp.value = "";
+                editDueDateInp.value = "";
+                editDueTimeInp.value = "";
+                editDescInp.value = "";
+                editColabInp.value = "";
+                editPriorityInp.value = 0;
+                const docRef = doc(db, "colabs", currentEditingTask.id);
+                await setDoc(docRef, editObject, { merge: true });
+                readsAndWritesSession += 1;
+                await collectDataToDisplay();
+                mainUserMenu.style.display = "grid";
+                editOneTask.style.display = "none";
+            } else {
+                let editObject = {
+                    projName: editNameInp.value,
+                    projDueDate: editDueDateInp.value,
+                    projDueTime: editDueTimeInp.value,
+                    projDesc: editDescInp.value,
+                    projContributors: editColabInp.value.replaceAll(" ", "").split(","),
+                    priority: editPriorityInp.value,
+                }
+                editNameInp.value = "";
+                editDueDateInp.value = "";
+                editDueTimeInp.value = "";
+                editDescInp.value = "";
+                editColabInp.value = "";
+                editPriorityInp.value = 0;
+                console.log("task: " +  currentEditingTask)
+                console.log("task edited id: " + currentEditingTask.id)
+                console.log("DB: " + db)
+                const docRef = doc(db, "users", uuid, "projects", currentEditingTask.id);
+                await setDoc(docRef, editObject, { merge: true })
+                readsAndWritesSession += 1;
+                await collectDataToDisplay();
+                mainUserMenu.style.display = "grid";
+                editOneTask.style.display = "none";
             }
-            editNameInp.value = "";
-            editDueDateInp.value = "";
-            editDueTimeInp.value = "";
-            editDescInp.value = "";
-            editColabInp.value = "";
-            editPriorityInp.value = 0;
-            console.log("task: " +  currentEditingTask)
-            console.log("task edited id: " + currentEditingTask.id)
-            console.log("DB: " + db)
-            const docRef = doc(db, "users", uuid, "projects", currentEditingTask.id);
-            await setDoc(docRef, editObject, { merge: true })
-            readsAndWritesSession += 1;
-            await collectDataToDisplay();
-            mainUserMenu.style.display = "grid";
-            editOneTask.style.display = "none";
         }
 
         window.viewProject = function(projectNumber) {
@@ -1238,7 +1290,7 @@
 
             projectListenerUnsubscribe = onSnapshot(
                 collection(db, "users", uuid, "projects"),
-                (snapshot) => {
+                async (snapshot) => {
                     taskCollection = [];
                     taskVisualList = [];
                     tasks = snapshot.size;
@@ -1250,6 +1302,11 @@
                         taskCollection.push(project);
                         taskVisualList.push(project.projName);
                     });
+                    const colabs = await findColabs();
+                    colabs.forEach((colab) => {
+                        taskCollection.push(colab);
+                        taskVisualList.push(colab.ProjName)
+                    })
                     getTotalTasks()
                     projectsTemporary = [...taskCollection];
                     displayList(taskCollection, priorityMethod);
@@ -1336,15 +1393,28 @@
         }
 
         async function findColabs() {
+            console.log("Finding colabs for " + uuid);
             const q = query(collection(db, "colabs"), where("Colabs", "array-contains", uuid));
             const colabsFetched = await getDocs(q);
-            const colabsData = colabsFetched.docs.map((colab) => ({
-                id: colab.id,
-                projName: colab.data().ProjName,
-                projDesc: colab.data().ProjDesc,
-                projDueDate: colab.data().ProjDueDate,
-                projContributors: colab.data().Colabs,
-            }));
+            const colabsData = colabsFetched.docs.map((colab) => {
+                const dueDateValue = colab.data().ProjDueDate;
+                const date = typeof dueDateValue?.toDate === "function"
+                    ? dueDateValue.toDate()
+                    : new Date(dueDateValue); 
+                const projDueDate = date.toISOString().slice(0, 10);
+                const projDueTime = date.toISOString().slice(11, 16);
+                return {
+                    id: colab.id,
+                    projName: colab.data().ProjName,
+                    projDesc: colab.data().ProjDesc,
+                    projDueDate: projDueDate,
+                    projDueTime: projDueTime,
+                    projContributors: colab.data().Colabs,
+                    priority: 0,
+                    colab: true,
+                }
+            });
+            console.log("Returned colab from query: ", colabsData[0]);
             return colabsData
         }
 
