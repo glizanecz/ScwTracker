@@ -1331,16 +1331,19 @@
                 taskVisualList.push(colab.ProjName)
             })
             projectsTemporary = [...taskCollection];
-
+            console.log(projectsTemporary)
             displayList(taskCollection, priorityMethod);
         }
 
         async function findColabs() {
-            const q = query(collection(db, "Colabs"), where("Colabs", "array-contains", uuid));
+            const q = query(collection(db, "colabs"), where("Colabs", "array-contains", uuid));
             const colabsFetched = await getDocs(q);
             const colabsData = colabsFetched.docs.map((colab) => ({
                 id: colab.id,
-                ...colab.data()
+                projName: colab.data().ProjName,
+                projDesc: colab.data().ProjDesc,
+                projDueDate: colab.data().ProjDueDate,
+                projContributors: colab.data().Colabs,
             }));
             return colabsData
         }
