@@ -1325,8 +1325,24 @@
                 taskCollection.push(project);
                 taskVisualList.push(project.projName);
             });
+            const colabs = await findColabs();
+            colabs.forEach((colab) => {
+                taskCollection.push(colab);
+                taskVisualList.push(colab.ProjName)
+            })
             projectsTemporary = [...taskCollection];
+
             displayList(taskCollection, priorityMethod);
+        }
+
+        async function findColabs() {
+            const q = query(collection(db, "Colabs"), where("Colabs", "array-contains", uuid));
+            const colabsFetched = await getDocs(q);
+            const colabsData = colabsFetched.docs.map((colab) => ({
+                id: colab.id,
+                ...colab.data()
+            }));
+            return colabsData
         }
 
 
