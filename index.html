@@ -147,6 +147,12 @@
         <button class="loggedButtons" id="submitReport"></button> <button class="loggedButtons" id="cancelReport"></button>
     </div>
 
+    <div id="userIsBanned">
+        <h3>You've Been Banned...</h3>
+        <h5 id="statusOfBan">User is still banned...</h5>
+        <h6>You can submit an appeal <a onclick="bringUserToAppeal()">here</a> if you feel this is incorrect...</h6>
+    </div>
+
     <script src="adjnouns.js"></script>
     <script src="bannedwordlist.js"></script>
     <script src="dateNormalize.js"></script>
@@ -288,6 +294,10 @@
         const reportDescInp = document.getElementById("reportDescInp");
         const submitReport = document.getElementById("submitReport");
         const cancelReport = document.getElementById("cancelReport");
+        //User has been banned
+        const userIsBanned = document.getElementById("userIsBanned");
+        const statusOfBan = document.getElementById("statusOfBan");
+
 
 
 
@@ -334,10 +344,16 @@
         let friendsListUnsubscribe = null;
         let friendsOutgoingUnsubscribe = null;
         let friendRequestsUnsubscribe = null;
+        let basicsUnsubscribe = null;
         //settings
         //reports
         let reportedTempUUID = null;
         let lastMenu = "";
+
+        window.bringUserToAppeal = function() {
+            document.querySelectorAll('div').forEach(div => div.style.display = 'none');
+            reportOrAppealMenu.style.display = "grid";
+        }
 
         window.signOutButton = function () {
             if (projectListenerUnsubscribe) {
@@ -621,7 +637,7 @@
                     reported: reportedTempUUID,
                     reportName: reportNameInp.value,
                     reportDesc: reportDescInp.value,
-                    type: reportOrAppealSelect
+                    type: reportOrAppealSelect.value
                 })
             }
         }
@@ -634,7 +650,7 @@
                 reportOrAppealMenu.style.display = "none";
                 friendsMenu.style.display = "grid";
             } else {
-                
+
             }
         }
 
@@ -1172,6 +1188,23 @@
                     displayList(taskCollection, priorityMethod);
                 }
             );
+        }
+
+        function startBasicsListener() {
+            if (basicsUnsubscribe) {
+                basicsUnsubscribe();
+            }
+
+            basicsUnsubscribe = onSnapshot(doc(db, "users", uuid, "userData", "banData"), (snapshot) => {
+                const usersBanData = snapshot.data();
+                if (usersBanData.banned === true) {
+                    document.querySelectorAll('div').forEach(div => div.style.display = 'none');
+                    userIsBanned.style.display = "grid";
+                } else {
+                    userIsBanned.style.display = "none";
+                    mainUserMenu.style.display = "grid";
+                }
+            })
         }
 
         onAuthStateChanged(auth, async (user) => {
