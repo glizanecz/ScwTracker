@@ -135,6 +135,18 @@
         </div>
     </div>
 
+    <div id="reportOrAppealMenu" class="background">
+        <h3>Report/Appeal Menu</h3>
+        <select id="reportOrAppeal">
+            <option>Report</option>
+            <option>Appeal</option>
+        </select>
+        <br>
+        <input class="loggedInput" maxlength="40" id="reportNameInp">
+        <textarea class="textarea" maxlength="600" id="reportDescInp"></textarea>
+        <button class="loggedButtons" id="submitReport"></button> <button class="loggedButtons" id="cancelReport"></button>
+    </div>
+
     <script src="adjnouns.js"></script>
     <script src="bannedwordlist.js"></script>
     <script src="dateNormalize.js"></script>
@@ -176,6 +188,7 @@
             writeBatch,
             arrayUnion,
             arrayRemove,
+            addDoc,
         } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";  
 
         const firebaseConfig = {
@@ -267,6 +280,14 @@
         const settingsFriends = document.getElementById("settingsFriends");
         const refreshRateInput = document.getElementById("refreshRateInput");
         const applyRefreshRate = document.getElementById("applyRefreshRate");
+        //Report/Appeal Menu
+        const reportOrAppealMenu = document.getElementById("reportOrAppealMenu");
+        reportOrAppealMenu.style.display = "none";
+        const reportOrAppealSelect = document.getElementById("reportOrAppeal");
+        const reportNameInp = document.getElementById("reportNameInp");
+        const reportDescInp = document.getElementById("reportDescInp");
+        const submitReport = document.getElementById("submitReport");
+        const cancelReport = document.getElementById("cancelReport");
 
 
 
@@ -314,6 +335,9 @@
         let friendsOutgoingUnsubscribe = null;
         let friendRequestsUnsubscribe = null;
         //settings
+        //reports
+        let reportedTempUUID = null;
+        let lastMenu = "";
 
         window.signOutButton = function () {
             if (projectListenerUnsubscribe) {
@@ -582,7 +606,36 @@
         }
 
         window.reportFriend = async function(reportFriendID) {
-            //add function for this later
+            lastMenu = "friends"
+            friendsMenu.style.display = "none";
+            reportOrAppealMenu.style.display = "grid";
+            reportedTempUUID = reportFriendID
+        }
+
+        submitReport.onclick = async function () {
+            if (reportNameInp.length === 0 || reportDescInp.length === 0 || reportOrAppealSelect === "") {
+                console.log("One or more inputs haven't been filled out...")
+            } else {
+                await addDoc(doc(db, "reports"), {
+                    reporter: uuid,
+                    reported: reportedTempUUID,
+                    reportName: reportNameInp.value,
+                    reportDesc: reportDescInp.value,
+                    type: reportOrAppealSelect
+                })
+            }
+        }
+
+        cancelReport.onclick = function () {
+            reportNameInp.value = "";
+            reportDescInp.value = "";
+            reportOrAppealSelect.value = "Report";
+            if (lastMenu === "friends") {
+                reportOrAppealMenu.style.display = "none";
+                friendsMenu.style.display = "grid";
+            } else {
+                
+            }
         }
 
         cancelProjBtn.onclick = function() {

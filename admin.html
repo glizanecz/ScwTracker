@@ -122,29 +122,54 @@
                 while (reportObjects.length > currentReport) {
                     stillAwaitingAnswer = true;
                     const reportInfo = reportObjects[currentReport];
-                    reportName.innerText = reportInfo.reportName
-                    reportDesc.innerText = reportInfo.reportDesc
-                    reportedUUID.innerText = reportInfo.reported
-                    reporterUUID.innerText = reportInfo.reporter
-                    while (stillAwaitingAnswer === true) {
-                        await sleep(100)
+                    if (reportInfo.type === "Appeal") {
+                        banUser.innerText = "Approve"
+                        warnUser.innerText = "Deny"
+                        ignoreRep.style.display = "none"
+                        reportName.innerText = reportInfo.reportName
+                        reportDesc.innerText = reportInfo.reportDesc
+                        reporterUUID.innerText = reportInfo.reporter
+                        reportedUUID.innerText = "This is an appeal, no person has been reported..."
+                        while (stillAwaitingAnswer === true) {
+                            await sleep(100)
+                        }
+                        if (clickOption === "ban") {
+                            batch.set(doc(db, "users", reportInfo.reporter, "userData", "banData"), {
+                                banned: false
+                            }, { merge: true })
+                        } else {
+                            batch.set(doc(db, "users", reportInfo.reporter, "userData", "banData"), {
+                                status: "Your appeal has been denied..."
+                            }, { merge: true })
+                        }
+                    } else {
+                        banUser.innerText = "Ban User"
+                        warnUser.innerText = "Warn User"
+                        ignoreRep.style.display = "grid";
+                        reportName.innerText = reportInfo.reportName
+                        reportDesc.innerText = reportInfo.reportDesc
+                        reportedUUID.innerText = reportInfo.reported
+                        reporterUUID.innerText = reportInfo.reporter
+                        while (stillAwaitingAnswer === true) {
+                            await sleep(100)
+                        }
+                        if (clickOption === "warn") {
+                            warns.push(reportInfo.reported)
+                            batch.set(doc(db, "users", reportInfo.reported, "userData", "banData"), {
+                                warns: increment(1)
+                            }, { merge: true })
+                            batch.delete(doc(db,"reports",reportInfo.id))
+                        } else if (clickOption === "ban") {
+                            bans.push(reportInfo.reported)
+                            batch.set(doc(db, "users", reportInfo.reported, "userData", "banData"), {
+                                banned: true
+                            }, { merge: true })
+                            batch.delete(doc(db, "reports", reportInfo.id))
+                        } else if (clickOption === "ignore") {
+                            batch.delete(doc(db, "reports", reportInfo.id))
+                        }
+                        currentReport++;
                     }
-                    if (clickOption === "warn") {
-                        warns.push(reportInfo.reported)
-                        batch.set(doc(db, "users", reportInfo.reported, "userData", "banData"), {
-                            warns: increment(1)
-                        }, { merge: true })
-                        batch.delete(doc(db,"reports",reportInfo.id))
-                    } else if (clickOption === "ban") {
-                        bans.push(reportInfo.reported)
-                        batch.set(doc(db, "users", reportInfo.reported, "userData", "banData"), {
-                            banned: true
-                        }, { merge: true })
-                        batch.delete(doc(db, "reports", reportInfo.id))
-                    } else if (clickOption === "ignore") {
-                        batch.delete(doc(db, "reports", reportInfo.id))
-                    }
-                    currentReport++;
                 }
                 reportName.innerText = "Report Name Here...";
                 reportDesc.innerText = "Report Description Here...";
