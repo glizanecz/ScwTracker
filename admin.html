@@ -142,6 +142,8 @@
                                 status: "Your appeal has been denied..."
                             }, { merge: true })
                         }
+                        batch.delete(doc(db, "reports", reportInfo.id))
+                        currentReport++
                     } else {
                         banUser.innerText = "Ban User"
                         warnUser.innerText = "Warn User"
