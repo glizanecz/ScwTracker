@@ -637,7 +637,7 @@
                 friends: arrayRemove(blockFriendID)
             })
             await batch.commit()
-            
+
             friends = friends.filter(friendOne => friendOne.uuid !== blockFriendID)
             friendsList.innerHTML = "";
             for (const friend of friends) {
@@ -1197,6 +1197,7 @@
             userWelcome.innerText = "Hello " + username + "!";
             await setUserBasicsData(0)
             await setUsesData("username");
+            await setUserBanData()
             refreshDisplay();
             startProjectListener();
             startOutgoingListener();
@@ -1284,6 +1285,7 @@
                 refreshDisplay();
                 loginMenuBack.style.display = "none";
                 await loadUserData();
+                await setUserBanData()
                 mainUserMenu.style.display = "grid";
                 startProjectListener();
                 startOutgoingListener();
@@ -1347,6 +1349,22 @@
             } catch (error) {
                 console.log("User data couldn't be loaded!")
                 console.error(error);
+            }
+        }
+
+        async function setUserBanData() {
+            try {
+                const snapshot = await getDoc(doc(db, "users", uuid, "userData", "banData"));
+                readsAndWritesSession += 1;
+                if (snapshot.exists()) {
+                    return
+                } else {
+                    await setDoc(doc(db, "users", uuid, "userData", "banData"), {
+                        banned: false,
+                        warns: 0,
+                        status: "",
+                    });
+                }
             }
         }
 
