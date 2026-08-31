@@ -1195,9 +1195,9 @@
                 username = adjectives[Math.floor(Math.random() * adjectives.length)] + nouns[Math.floor(Math.random() * nouns.length)] + String(Math.floor(Math.random() * 10000));
             }
             userWelcome.innerText = "Hello " + username + "!";
+            await setUserBanData()
             await setUserBasicsData(0)
             await setUsesData("username");
-            await setUserBanData()
             refreshDisplay();
             startProjectListener();
             startOutgoingListener();
@@ -1284,8 +1284,8 @@
                 uuid = user.uid;
                 refreshDisplay();
                 loginMenuBack.style.display = "none";
-                await loadUserData();
                 await setUserBanData()
+                await loadUserData();
                 mainUserMenu.style.display = "grid";
                 startProjectListener();
                 startOutgoingListener();
