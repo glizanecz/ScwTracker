@@ -137,14 +137,17 @@
 
     <div id="reportOrAppealMenu" class="background">
         <h3>Report/Appeal Menu</h3>
+        <h4>Report Type:</h4>
         <select id="reportOrAppeal">
             <option>Report</option>
             <option>Appeal</option>
         </select>
         <br>
+        <h4>Report Name:</h4>
         <input class="loggedInput" maxlength="40" id="reportNameInp">
+        <h4>Report Description:</h4>
         <textarea class="textarea" maxlength="600" id="reportDescInp"></textarea>
-        <button class="loggedButtons" id="submitReport"></button> <button class="loggedButtons" id="cancelReport"></button>
+        <button class="loggedButtons" id="submitReport">Submit</button> <button class="loggedButtons" id="cancelReport">Cancel</button>
     </div>
 
     <div id="userIsBanned">
@@ -350,6 +353,7 @@
         //reports
         let reportedTempUUID = null;
         let lastMenu = "";
+        let wasBanned = null;
 
         window.bringUserToAppeal = function() {
             document.querySelectorAll('div').forEach(div => div.style.display = 'none');
@@ -368,6 +372,11 @@
             if (friendsListUnsubscribe) {
                 friendsListUnsubscribe();
                 friendsListUnsubscribe = null;
+            }
+
+            if (basicsUnsubscribe) {
+                basicsUnsubscribe();
+                basicsUnsubscribe = null;
             }
             signOut(auth)
         }
@@ -619,7 +628,28 @@
         }
 
         window.blockFriend = async function(blockFriendID) {
-            //add function for this later
+            const batch = writeBatch(db);
+            batch.update(doc(db, "uses", uuid), {
+                friends: arrayRemove(blockFriendID),
+                blocked: arrayUnion(blockFriendID)
+            })
+            batch.update(doc(db, "uses", blockFriendID), {
+                friends: arrayRemove(blockFriendID)
+            })
+            await batch.commit()
+            
+            friends = friends.filter(friendOne => friendOne.uuid !== blockFriendID)
+            friendsList.innerHTML = "";
+            for (const friend of friends) {
+                console.log(friend.username);
+                console.log(friend.uuid);
+                friendsList.innerHTML += `<div class='friendsListItem'>
+                                            <h4>${friend.username}</h4>
+                                            <button onclick="removeFriend('${friend.uuid}')" class="loggedButtons">Remove 🚫</button>
+                                            <button onclick="blockFriend('${friend.uuid}')" class="loggedButtons">Block ⛔</button>
+                                            <button onclick="reportFriend('${friend.uuid}')" class="loggedButtons">Report 🚩</button>
+                                        </div>`
+            }
         }
 
         window.reportFriend = async function(reportFriendID) {
@@ -630,16 +660,45 @@
         }
 
         submitReport.onclick = async function () {
-            if (reportNameInp.length === 0 || reportDescInp.length === 0 || reportOrAppealSelect === "") {
+            if (reportNameInp.length === 0 || reportDescInp.length === 0 || reportOrAppealSelect.value === "") {
                 console.log("One or more inputs haven't been filled out...")
             } else {
-                await addDoc(doc(db, "reports"), {
-                    reporter: uuid,
-                    reported: reportedTempUUID,
-                    reportName: reportNameInp.value,
-                    reportDesc: reportDescInp.value,
-                    type: reportOrAppealSelect.value
-                })
+                if (wasBanned === true) {
+                    await addDoc(collection(db, "reports"), {
+                        reporter: uuid,
+                        reported: reportedTempUUID,
+                        reportName: reportNameInp.value,
+                        reportDesc: reportDescInp.value,
+                        type: "Appeal"
+                    })
+                    reportNameInp.innerText = "";
+                    reportDescInp.innerText = "";
+                    reportOrAppealMenu.style.display = "none";
+                    userIsBanned.style.display = "grid";
+                } else {
+                    await addDoc(collection(db, "reports"), {
+                        reporter: uuid,
+                        reported: reportedTempUUID,
+                        reportName: reportNameInp.value,
+                        reportDesc: reportDescInp.value,
+                        type: reportOrAppealSelect.value
+                    })
+                    reportNameInp.innerText = "";
+                    reportDescInp.innerText = "";
+                    reportOrAppealMenu.style.display = "none";
+                    friendsMenu.style.display = "grid";
+                }
+            }
+        }
+        
+        cancelReport.onclick = function() {
+            reportNameInp.innerText = "";
+            reportDescInp.innerText = "";
+            reportOrAppealMenu.style.display = "none";
+            if (lastMenu === "friends") {
+                friendsMenu.style.display = "grid";
+            } else {
+                userIsBanned.style.display = "grid";
             }
         }
 
@@ -1082,6 +1141,10 @@
                     friendsListUnsubscribe();
                     friendsListUnsubscribe = null;
                 }
+                if (basicsUnsubscribe) {
+                    basicsUnsubscribe();
+                    basicsUnsubscribe = null;
+                }
                 signOut(auth)
                 alert("Your internet disconnected! Reconnect and sign back in!")
             } else if (uuid !== null && uuid !== undefined) {
@@ -1103,6 +1166,7 @@
                 startOutgoingListener();
                 startRequestsListener();
                 startFriendsListener();
+                startBasicsListener()
             } else {
                 console.log("Couldn't login!")
             }
@@ -1138,6 +1202,7 @@
             startOutgoingListener();
             startRequestsListener();
             startFriendsListener();
+            startBasicsListener()
         }
 
         async function signUp() {
@@ -1199,11 +1264,16 @@
             basicsUnsubscribe = onSnapshot(doc(db, "users", uuid, "userData", "banData"), (snapshot) => {
                 const usersBanData = snapshot.data();
                 if (usersBanData.banned === true) {
+                    wasBanned = true;
                     document.querySelectorAll('div').forEach(div => div.style.display = 'none');
                     userIsBanned.style.display = "grid";
+                } else if (wasBanned === true && usersBanData.banned === false) {
+                    reportOrAppealMenu.style.display = "none";
+                    userIsBanned.style.display = "grid";
+                    statusOfBan.innerText = "You've been unbanned, please refresh for changes to take place..."
+                    wasBanned === false;
                 } else {
-                    userIsBanned.style.display = "none";
-                    mainUserMenu.style.display = "grid";
+
                 }
             })
         }
@@ -1219,6 +1289,7 @@
                 startOutgoingListener();
                 startRequestsListener();
                 startFriendsListener();
+                startBasicsListener()
             } else {
                 uuid = null;
                 loginMenuBack.style.display = "grid";

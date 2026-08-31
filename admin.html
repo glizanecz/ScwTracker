@@ -134,13 +134,13 @@
                             await sleep(100)
                         }
                         if (clickOption === "ban") {
-                            batch.set(doc(db, "users", reportInfo.reporter, "userData", "banData"), {
+                            batch.update(doc(db, "users", reportInfo.reporter, "userData", "banData"), {
                                 banned: false
-                            }, { merge: true })
+                            })
                         } else {
-                            batch.set(doc(db, "users", reportInfo.reporter, "userData", "banData"), {
+                            batch.update(doc(db, "users", reportInfo.reporter, "userData", "banData"), {
                                 status: "Your appeal has been denied..."
-                            }, { merge: true })
+                            })
                         }
                         batch.delete(doc(db, "reports", reportInfo.id))
                         currentReport++
