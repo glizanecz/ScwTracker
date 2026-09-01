@@ -1058,6 +1058,23 @@
             editPriorityInp.value = root.priority;
         }
 
+        async function transformUserData(inputArray, outputWish) {
+            let outcomeArray = [];
+            const snapshot = await getDocs(collection(db, "uses"))
+            readsAndWritesSession += 1;
+            const uses = snapshot.docs.map(doc => ({
+                ...doc.data()
+            }));
+            for (let i = 0; i < inputArray.length; i++) {
+                for (let x = 0; x < uses.length; x++) {
+                    if ((outputWish === "uuid" ? uses[x].username : uses[x].uuid) === inputArray[i]) {
+                        outcomeArray.push((outputWish === "uuid" ? uses[x].uuid : uses[x].username))
+                        break
+                    }
+                }
+            }
+        }
+
         projCreateBtn.onclick = async function () {
             if (projCreateLock === 0) {
                 if (projColabInp.value.replaceAll(" ", "").split(",").length !== 0) {
