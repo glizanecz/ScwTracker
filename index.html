@@ -1060,52 +1060,87 @@
 
         projCreateBtn.onclick = async function () {
             if (projCreateLock === 0) {
-                projCreateLock = 1;
-                projName = projNameInp.value;
-                projNameInp.value = "";
-                projDesc = projDescInp.value;
-                projDescInp.value = "";
-                projPriority = projPriorityInp.value;
-                projPriorityInp.value = "";
-                projDueDate = projDueDateInp.value;
-                projDueDateInp.value = "";
-                projDueTime = projDueTimeInp.value;
-                projDueTimeInp.value = "";
-                projContributors = projColabInp.value
-                projContributors = projContributors.replaceAll(" ", "").split(",")
-                projColabInp.value = "";
-                await getTotalTasks();
-                const batch = writeBatch(db);
-                if (unusedProjects !== undefined && unusedProjects.length > 0) {
-                    let usedProjectID = unusedProjects.shift();
-                    projectID = usedProjectID;
+                if (projColabInp.value.replaceAll(" ", "").split(",").length !== 0) {
+                    projCreateLock = 1;
+                    projName = projNameInp.value;
+                    projNameInp.value = "";
+                    projDesc = projDescInp.value;
+                    projDescInp.value = "";
+                    projPriority = projPriorityInp.value;
+                    projPriorityInp.value = "";
+                    projDueDate = projDueDateInp.value;
+                    projDueDateInp.value = "";
+                    projDueTime = projDueTimeInp.value;
+                    projDueTimeInp.value = "";
+                    projContributors = projColabInp.value
+                    projContributors = projContributors.replaceAll(" ", "").split(",")
+                    projColabInp.value = "";
+                    await getTotalTasks();
+                    const batch = writeBatch(db);
+                    if (unusedProjects !== undefined && unusedProjects.length > 0) {
+                        let usedProjectID = unusedProjects.shift();
+                        projectID = usedProjectID;
+                        batch.update(doc(db, "users", uuid, "userData", "projectData"), {
+                            unusedProjects: arrayRemove(usedProjectID)
+                        });  
+                    } else {
+                        projectID = "proj" + (tasks + 1);
+                    }
                     batch.update(doc(db, "users", uuid, "userData", "projectData"), {
-                        unusedProjects: arrayRemove(usedProjectID)
-                    });  
-                } else {
-                    projectID = "proj" + (tasks + 1);
-                }
-                batch.update(doc(db, "users", uuid, "userData", "projectData"), {
-                    tasksTotal: increment(1),
-                });
-                batch.set(doc(db, "users", uuid, "projects", projectID), {
-                    projName: projName,
-                    projDesc: projDesc,
-                    priority: projPriority,
-                    projDueDate: projDueDate,
-                    projDueTime: projDueTime,
-                    projContributors: projContributors,
-                    id: projectID,
-                });
-                tasks++;
-                await batch.commit();
-                readsAndWritesSession += 1;
+                        tasksTotal: increment(1),
+                    });
+                    batch.set(doc(db, "users", uuid, "projects", projectID), {
+                        projName: projName,
+                        projDesc: projDesc,
+                        priority: projPriority,
+                        projDueDate: projDueDate,
+                        projDueTime: projDueTime,
+                        projContributors: projContributors,
+                        id: projectID,
+                    });
+                    tasks++;
+                    await batch.commit();
+                    readsAndWritesSession += 1;
 
-                await collectDataToDisplay();
-                await setUserBasicsData(0);
-                addTaskMenu.style.display = "none";
-                mainUserMenu.style.display = "grid";
-                projCreateLock = 0;
+                    await collectDataToDisplay();
+                    await setUserBasicsData(0);
+                    addTaskMenu.style.display = "none";
+                    mainUserMenu.style.display = "grid";
+                    projCreateLock = 0;
+                } else {
+                    projCreateLock = 1;
+                    projName = projNameInp.value;
+                    projNameInp.value = "";
+                    projDesc = projDescInp.value;
+                    projDescInp.value = "";
+                    projPriority = projPriorityInp.value;
+                    projPriorityInp.value = "";
+                    projDueDate = projDueDateInp.value;
+                    projDueDateInp.value = "";
+                    projDueTime = projDueTimeInp.value;
+                    projDueTimeInp.value = "";
+                    projContributors = projColabInp.value
+                    projContributors = projContributors.replaceAll(" ", "").split(",")
+                    if (!projContributors.includes(username) && !projContributors.includes(uuid)) {
+                        projContributors.push(uuid)
+                    }
+                    projColabInp.value = "";
+                    await addDoc(collection(db, "colabs"), {
+                        ProjName: projName,
+                        ProjDesc: projDesc,
+                        ProjDueDate: `${projDueDate}T${projDueTime}`,
+                        Colabs: projContributors,
+                        Owner: uuid,
+                        Editors: [],
+                        Viewers: [],
+                        currentEditing: false,
+                    })
+                    readsAndWritesSession += 1;
+                    await collectDataToDisplay();
+                    addTaskMenu.style.display = "none";
+                    mainUserMenu.style.display = "grid";
+                    projCreateLock = 0;
+                }
             }
         }
 
